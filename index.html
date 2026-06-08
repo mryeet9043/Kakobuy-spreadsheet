@@ -312,14 +312,12 @@ const EXCHANGE_RATES = {
 // Automatically reads and fetches your folder structure through GitHub's API
 async function autoLoadGitHubCards() {
     const gridContainer = document.getElementById('cardGrid');
-    
-    // 1. Get the current URL information to talk directly to your repository
     const currentUrl = window.location.href;
     
-    // Fallback default structure if testing locally, replace with your actual username/repo name
-    let githubUser = "YOUR_GITHUB_USERNAME"; 
-    let githubRepo = "YOUR_REPO_NAME"; 
+    let githubUser = ""; 
+    let githubRepo = ""; 
 
+    // Auto-detect username and repository name if hosted on GitHub Pages
     if (currentUrl.includes("github.io")) {
         const pathParts = window.location.hostname.split('.');
         githubUser = pathParts[0];
@@ -328,14 +326,14 @@ async function autoLoadGitHubCards() {
         githubRepo = repoParts[1] || "";
     }
 
-    // If still on defaults, show hint message
-    if (githubUser === "YOUR_GITHUB_USERNAME") {
-        document.getElementById('loadingMsg').innerText = "Ready for GitHub. Push this code to your repository, and it will load everything automatically!";
+    // If running locally or detection fails, fallback or remind user
+    if (!githubUser || !githubRepo) {
+        document.getElementById('loadingMsg').innerText = "Ready for GitHub. Push this file to your repository and it will automatically monitor your 'cards/' folder.";
         return;
     }
 
     try {
-        // 2. Ask GitHub's API what files exist inside your 'cards' folder
+        // Query the repository contents path using GitHub's Public API
         const apiResponse = await fetch(`https://api.github.com/repos/${githubUser}/${githubRepo}/contents/cards`);
         
         if (!apiResponse.ok) {
@@ -347,14 +345,14 @@ async function autoLoadGitHubCards() {
         const jsonFiles = filesList.filter(file => file.name.endsWith('.json'));
 
         if (jsonFiles.length === 0) {
-            gridContainer.innerHTML = `<div class="no-cards-msg">The 'cards' folder is currently empty. Drop your JSON files in to show them off!</div>`;
+            gridContainer.innerHTML = `<div class="no-cards-msg">The 'cards' folder is currently empty. Drop your JSON files in to populate the hub.</div>`;
             return;
         }
 
-        // Clear loading screen
+        // Clear dynamic elements loading wrapper
         gridContainer.innerHTML = '';
 
-        // 3. Download and render every JSON file found
+        // Iterate and pull content data streams from found files
         for (const file of jsonFiles) {
             try {
                 const fileContentResponse = await fetch(file.download_url);
@@ -374,12 +372,12 @@ async function autoLoadGitHubCards() {
                 `;
                 gridContainer.insertAdjacentHTML('beforeend', cardHtml);
             } catch (err) {
-                console.error("Error reading item data structure:", err);
+                console.error("Error reading JSON payload formatting rules:", err);
             }
         }
     } catch (error) {
-        console.error("GitHub API directory scanning failed:", error);
-        document.getElementById('loadingMsg').innerText = "Failed to load files from GitHub API storage tracks.";
+        console.error("GitHub API transaction execution failure:", error);
+        document.getElementById('loadingMsg').innerText = "Failed to synchronize index layouts with GitHub API storage profiles.";
     }
 }
 
