@@ -238,7 +238,6 @@
             font-weight: 500;
         }
 
-        /* Message shown if no cards are added yet */
         .no-cards-msg {
             text-align: center;
             grid-column: 1 / -1;
@@ -268,7 +267,7 @@
     <h1 class="hub-heading">Live Showcase Hub</h1>
     
     <div class="card-grid" id="cardGrid">
-        <div class="no-cards-msg" id="loadingMsg">Loading collection...</div>
+        <div class="no-cards-msg" id="loadingMsg">Loading collections from GitHub storage...</div>
     </div>
 
     <div class="modal-overlay" id="vaultModal" onclick="closeVault(event)">
@@ -302,7 +301,6 @@
     </div>
 
 <script>
-// Cache map for active live items loaded from files
 let loadedItemsStorage = {};
 
 const EXCHANGE_RATES = {
@@ -311,53 +309,77 @@ const EXCHANGE_RATES = {
     GBP: 0.78
 };
 
-/**
- * CONFIGURATION INDEX ARRAY
- * Add your downloaded file names here whenever you add new items to the cards/ folder.
- * Example: ['item_1717904321.json', 'item_1717904555.json']
- */
-const CARD_FILES_INDEX = [
-    // Paste item JSON filenames inside here to make them go live
-];
-
-// Automatically bootstrap database tracking arrays on page load
-async function fetchAndRenderCards() {
+// Automatically reads and fetches your folder structure through GitHub's API
+async function autoLoadGitHubCards() {
     const gridContainer = document.getElementById('cardGrid');
     
-    if (CARD_FILES_INDEX.length === 0) {
-        document.getElementById('loadingMsg').innerText = "No active showcase cards found. Drop JSON cards inside the index array to display items.";
+    // 1. Get the current URL information to talk directly to your repository
+    const currentUrl = window.location.href;
+    
+    // Fallback default structure if testing locally, replace with your actual username/repo name
+    let githubUser = "YOUR_GITHUB_USERNAME"; 
+    let githubRepo = "YOUR_REPO_NAME"; 
+
+    if (currentUrl.includes("github.io")) {
+        const pathParts = window.location.hostname.split('.');
+        githubUser = pathParts[0];
+        
+        const repoParts = window.location.pathname.split('/');
+        githubRepo = repoParts[1] || "";
+    }
+
+    // If still on defaults, show hint message
+    if (githubUser === "YOUR_GITHUB_USERNAME") {
+        document.getElementById('loadingMsg').innerText = "Ready for GitHub. Push this code to your repository, and it will load everything automatically!";
         return;
     }
-    
-    // Clear initial loading message layout context safely
-    gridContainer.innerHTML = '';
 
-    // Loop through the listed data objects concurrently
-    for (const fileName of CARD_FILES_INDEX) {
-        try {
-            const response = await fetch(`cards/${fileName}`);
-            if (!response.ok) throw new Error(`Could not load card file: ${fileName}`);
-            
-            const itemData = await response.json();
-            
-            // Map into standard local dynamic storage
-            loadedItemsStorage[itemData.id] = itemData;
-            
-            // Generate standard front UI card block
-            const cardHtml = `
-                <div class="preview-card" id="${itemData.id}" onclick="openVaultModal('${itemData.id}')">
-                    <div class="card-img-wrap">
-                        <img src="${itemData.img}" alt="Product Image" onerror="this.src='https://placehold.co/400x300?text=Image+Not+Found'">
-                    </div>
-                    <div class="card-content">
-                        <div class="card-title">${itemData.title}</div>
-                    </div>
-                </div>
-            `;
-            gridContainer.insertAdjacentHTML('beforeend', cardHtml);
-        } catch (error) {
-            console.error("Error building card item node:", error);
+    try {
+        // 2. Ask GitHub's API what files exist inside your 'cards' folder
+        const apiResponse = await fetch(`https://api.github.com/repos/${githubUser}/${githubRepo}/contents/cards`);
+        
+        if (!apiResponse.ok) {
+            gridContainer.innerHTML = `<div class="no-cards-msg">Make sure you have created a folder named 'cards' inside your repository and placed your JSON files inside it!</div>`;
+            return;
         }
+
+        const filesList = await apiResponse.json();
+        const jsonFiles = filesList.filter(file => file.name.endsWith('.json'));
+
+        if (jsonFiles.length === 0) {
+            gridContainer.innerHTML = `<div class="no-cards-msg">The 'cards' folder is currently empty. Drop your JSON files in to show them off!</div>`;
+            return;
+        }
+
+        // Clear loading screen
+        gridContainer.innerHTML = '';
+
+        // 3. Download and render every JSON file found
+        for (const file of jsonFiles) {
+            try {
+                const fileContentResponse = await fetch(file.download_url);
+                const itemData = await fileContentResponse.json();
+                
+                loadedItemsStorage[itemData.id] = itemData;
+                
+                const cardHtml = `
+                    <div class="preview-card" id="${itemData.id}" onclick="openVaultModal('${itemData.id}')">
+                        <div class="card-img-wrap">
+                            <img src="${itemData.img}" alt="Product Image" onerror="this.src='https://placehold.co/400x300?text=Image+Not+Found'">
+                        </div>
+                        <div class="card-content">
+                            <div class="card-title">${itemData.title}</div>
+                        </div>
+                    </div>
+                `;
+                gridContainer.insertAdjacentHTML('beforeend', cardHtml);
+            } catch (err) {
+                console.error("Error reading item data structure:", err);
+            }
+        }
+    } catch (error) {
+        console.error("GitHub API directory scanning failed:", error);
+        document.getElementById('loadingMsg').innerText = "Failed to load files from GitHub API storage tracks.";
     }
 }
 
@@ -396,8 +418,7 @@ function closeVault(event) {
     }
 }
 
-// Fire automated build loop when DOM context loads cleanly
-window.onload = fetchAndRenderCards;
+window.onload = autoLoadGitHubCards;
 </script>
 
 </body>
