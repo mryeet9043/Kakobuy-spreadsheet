@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Showcase Hub</title>
+    <style>
+        :root {
+            --mulebuy-color: #8c7ae6;
+            --kakobuy-color: #ff6b6b;
+            --litbuy-color: #ff7f50;
+            --oopbuy-color: #2e86de;
+            --bg-main: #f4f6f9;
+            --card-bg: #fff;
+            --vault-bg: #f5f5f7;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-main);
+            color: #111;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        
+        /* --- Showcase Layout Grid --- */
+        .hub-heading {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2f3640;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        .preview-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            user-select: none;
+        }
+        .preview-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+        }
+        .card-img-wrap {
+            width: 100%;
+            height: 200px;
+            background: #eee;
+            overflow: hidden;
+        }
+        .card-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .card-content {
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+        }
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+            color: #111;
+            line-height: 1.4;
+        }
+
+        /* --- Perfectly Sized Square Frame Modal Window --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .vault-container {
+            background-color: #fcfbfa;
+            width: 580px;            
+            height: 520px;           
+            border-radius: 24px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+            padding: 24px;
+            box-sizing: border-box;
+            overflow: hidden;        
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUp {
+            from { transform: translateY(15px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .vault-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+        .vault-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+            color: #111;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 400px;
+        }
+        .btn-close-vault {
+            background: white;
+            border: 1px solid #e1e0de;
+            color: #111;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+        .btn-close-vault:hover {
+            background: #f5f5f7;
+        }
+        
+        /* Two-column view structured to eliminate scrollbars */
+        .vault-split-view {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 20px;
+            flex-grow: 1;
+            min-height: 0; 
+        }
+        
+        .vault-left-col {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 0;
+        }
+        .vault-main-img {
+            width: 100%;
+            height: 240px;
+            background: #e9e8e6;
+            border-radius: 16px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .vault-main-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .agent-buttons-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .vault-agent-btn {
+            display: block;
+            text-align: center;
+            padding: 9px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 10px;
+            font-size: 13px;
+            transition: opacity 0.2s;
+            flex-shrink: 0;
+        }
+        .vault-agent-btn:hover { opacity: 0.9; }
+        .v-mulebuy { background-color: var(--mulebuy-color); }
+        .v-kakobuy { background-color: var(--kakobuy-color); }
+        .v-litbuy { background-color: var(--litbuy-color); }
+        .v-oopbuy { background-color: var(--oopbuy-color); }
+
+        /* Right Column Details */
+        .vault-right-col {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        .vault-pricing-box {
+            background: white;
+            border: 1px solid #e9e8e6;
+            border-radius: 16px;
+            padding: 16px;
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; 
+        }
+
+        /* Price block Style */
+        .vault-price-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end; 
+            gap: 6px;
+        }
+        .vault-price-badge {
+            background: transparent;
+            color: #111;
+            font-weight: 700;
+            font-size: 24px;
+        }
+        .vault-currency-conversions {
+            font-size: 13px;
+            color: #111;
+            text-align: right;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        /* Message shown if no cards are added yet */
+        .no-cards-msg {
+            text-align: center;
+            grid-column: 1 / -1;
+            color: #777;
+            padding: 40px;
+            font-size: 16px;
+        }
+
+        @media (max-width: 620px) {
+            .vault-container {
+                width: 95%;
+                height: auto;
+                max-height: 95vh;
+                overflow-y: auto;
+            }
+            .vault-split-view {
+                grid-template-columns: 1fr;
+            }
+            .vault-main-img {
+                height: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="hub-heading">Live Showcase Hub</h1>
+    
+    <div class="card-grid" id="cardGrid">
+        <div class="no-cards-msg" id="loadingMsg">Loading collection...</div>
+    </div>
+
+    <div class="modal-overlay" id="vaultModal" onclick="closeVault(event)">
+        <div class="vault-container" onclick="event.stopPropagation()">
+            
+            <div class="vault-header">
+                <h1 class="vault-title" id="vTitle">Product Title</h1>
+                <button class="btn-close-vault" onclick="closeVault(null)">Close</button>
+            </div>
+
+            <div class="vault-split-view">
+                
+                <div class="vault-left-col">
+                    <div class="vault-main-img">
+                        <img id="vImg" src="" alt="Main Preview">
+                    </div>
+                    <div class="agent-buttons-stack" id="vAgentStack"></div>
+                </div>
+                
+                <div class="vault-right-col">
+                    <div class="vault-pricing-box">
+                        <div class="vault-price-container">
+                            <span class="vault-price-badge" id="vPriceUsd">$0.00</span>
+                            <div class="vault-currency-conversions" id="vPriceConversions"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+<script>
+// Cache map for active live items loaded from files
+let loadedItemsStorage = {};
+
+const EXCHANGE_RATES = {
+    CNY: 7.24,
+    EUR: 0.92,
+    GBP: 0.78
+};
+
+/**
+ * CONFIGURATION INDEX ARRAY
+ * Add your downloaded file names here whenever you add new items to the cards/ folder.
+ * Example: ['item_1717904321.json', 'item_1717904555.json']
+ */
+const CARD_FILES_INDEX = [
+    // Paste item JSON filenames inside here to make them go live
+];
+
+// Automatically bootstrap database tracking arrays on page load
+async function fetchAndRenderCards() {
+    const gridContainer = document.getElementById('cardGrid');
+    
+    if (CARD_FILES_INDEX.length === 0) {
+        document.getElementById('loadingMsg').innerText = "No active showcase cards found. Drop JSON cards inside the index array to display items.";
+        return;
+    }
+    
+    // Clear initial loading message layout context safely
+    gridContainer.innerHTML = '';
+
+    // Loop through the listed data objects concurrently
+    for (const fileName of CARD_FILES_INDEX) {
+        try {
+            const response = await fetch(`cards/${fileName}`);
+            if (!response.ok) throw new Error(`Could not load card file: ${fileName}`);
+            
+            const itemData = await response.json();
+            
+            // Map into standard local dynamic storage
+            loadedItemsStorage[itemData.id] = itemData;
+            
+            // Generate standard front UI card block
+            const cardHtml = `
+                <div class="preview-card" id="${itemData.id}" onclick="openVaultModal('${itemData.id}')">
+                    <div class="card-img-wrap">
+                        <img src="${itemData.img}" alt="Product Image" onerror="this.src='https://placehold.co/400x300?text=Image+Not+Found'">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">${itemData.title}</div>
+                    </div>
+                </div>
+            `;
+            gridContainer.insertAdjacentHTML('beforeend', cardHtml);
+        } catch (error) {
+            console.error("Error building card item node:", error);
+        }
+    }
+}
+
+function openVaultModal(cardId) {
+    const itemData = loadedItemsStorage[cardId];
+    if (!itemData) return;
+
+    document.getElementById('vTitle').innerText = itemData.title;
+    document.getElementById('vImg').src = itemData.img;
+    document.getElementById('vPriceUsd').innerText = `≈ $${itemData.price.toFixed(2)}`;
+    
+    const cnyVal = (itemData.price * EXCHANGE_RATES.CNY).toFixed(2);
+    const eurVal = (itemData.price * EXCHANGE_RATES.EUR).toFixed(2);
+    const gbpVal = (itemData.price * EXCHANGE_RATES.GBP).toFixed(2);
+    
+    document.getElementById('vPriceConversions').innerHTML = `
+        ¥ ${cnyVal}<br>
+        € ${eurVal}<br>
+        £ ${gbpVal}
+    `;
+    
+    const links = itemData.links;
+    document.getElementById('vAgentStack').innerHTML = `
+        <a href="${links.kakobuy}" target="_blank" class="vault-agent-btn v-kakobuy">Open in Kakobuy</a>
+        <a href="${links.mulebuy}" target="_blank" class="vault-agent-btn v-mulebuy">Open in Mulebuy</a>
+        <a href="${links.litbuy}" target="_blank" class="vault-agent-btn v-litbuy">Open in Litbuy</a>
+        <a href="${links.oopbuy}" target="_blank" class="vault-agent-btn v-oopbuy">Open in Oopbuy</a>
+    `;
+
+    document.getElementById('vaultModal').style.display = 'flex';
+}
+
+function closeVault(event) {
+    if (event === null || event.target === document.getElementById('vaultModal')) {
+        document.getElementById('vaultModal').style.display = 'none';
+    }
+}
+
+// Fire automated build loop when DOM context loads cleanly
+window.onload = fetchAndRenderCards;
+</script>
+
+</body>
+</html>
