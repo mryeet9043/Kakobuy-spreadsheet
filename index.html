@@ -148,7 +148,7 @@
             background: #f5f5f7;
         }
         
-        /* Two-column view structured to eliminate scrollbars */
+        /* Two-column layout */
         .vault-split-view {
             display: grid;
             grid-template-columns: 240px 1fr;
@@ -194,8 +194,8 @@
             flex-shrink: 0;
         }
         .vault-agent-btn:hover { opacity: 0.9; }
-        .v-mulebuy { background-color: var(--mulebuy-color); }
         .v-kakobuy { background-color: var(--kakobuy-color); }
+        .v-mulebuy { background-color: var(--mulebuy-color); }
         .v-litbuy { background-color: var(--litbuy-color); }
         .v-oopbuy { background-color: var(--oopbuy-color); }
 
@@ -267,7 +267,7 @@
     <h1 class="hub-heading">Live Showcase Hub</h1>
     
     <div class="card-grid" id="cardGrid">
-        <div class="no-cards-msg" id="loadingMsg">Loading collections from GitHub storage...</div>
+        <div class="no-cards-msg" id="loadingMsg">Checking GitHub storage...</div>
     </div>
 
     <div class="modal-overlay" id="vaultModal" onclick="closeVault(event)">
@@ -309,35 +309,19 @@ const EXCHANGE_RATES = {
     GBP: 0.78
 };
 
-// Automatically reads and fetches your folder structure through GitHub's API
+// Hardcoded repository pointers from your screenshots
+const GITHUB_USER = "mryeet9043";
+const GITHUB_REPO = "Kakobuy-spreadsheet";
+
 async function autoLoadGitHubCards() {
     const gridContainer = document.getElementById('cardGrid');
-    const currentUrl = window.location.href;
-    
-    let githubUser = ""; 
-    let githubRepo = ""; 
-
-    // Auto-detect username and repository name if hosted on GitHub Pages
-    if (currentUrl.includes("github.io")) {
-        const pathParts = window.location.hostname.split('.');
-        githubUser = pathParts[0];
-        
-        const repoParts = window.location.pathname.split('/');
-        githubRepo = repoParts[1] || "";
-    }
-
-    // If running locally or detection fails, fallback or remind user
-    if (!githubUser || !githubRepo) {
-        document.getElementById('loadingMsg').innerText = "Ready for GitHub. Push this file to your repository and it will automatically monitor your 'cards/' folder.";
-        return;
-    }
 
     try {
-        // Query the repository contents path using GitHub's Public API
-        const apiResponse = await fetch(`https://api.github.com/repos/${githubUser}/${githubRepo}/contents/cards`);
+        // Query the GitHub API for your cards folder contents
+        const apiResponse = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards`);
         
         if (!apiResponse.ok) {
-            gridContainer.innerHTML = `<div class="no-cards-msg">Make sure you have created a folder named 'cards' inside your repository and placed your JSON files inside it!</div>`;
+            gridContainer.innerHTML = `<div class="no-cards-msg">Could not find your 'cards/' folder. Please ensure it contains your .json files.</div>`;
             return;
         }
 
@@ -345,14 +329,13 @@ async function autoLoadGitHubCards() {
         const jsonFiles = filesList.filter(file => file.name.endsWith('.json'));
 
         if (jsonFiles.length === 0) {
-            gridContainer.innerHTML = `<div class="no-cards-msg">The 'cards' folder is currently empty. Drop your JSON files in to populate the hub.</div>`;
+            gridContainer.innerHTML = `<div class="no-cards-msg">Your 'cards/' folder is empty. Upload your JSON files to see them here!</div>`;
             return;
         }
 
-        // Clear dynamic elements loading wrapper
         gridContainer.innerHTML = '';
 
-        // Iterate and pull content data streams from found files
+        // Fetch and parse every individual JSON file found
         for (const file of jsonFiles) {
             try {
                 const fileContentResponse = await fetch(file.download_url);
@@ -372,12 +355,12 @@ async function autoLoadGitHubCards() {
                 `;
                 gridContainer.insertAdjacentHTML('beforeend', cardHtml);
             } catch (err) {
-                console.error("Error reading JSON payload formatting rules:", err);
+                console.error("Error formatting JSON item:", err);
             }
         }
     } catch (error) {
-        console.error("GitHub API transaction execution failure:", error);
-        document.getElementById('loadingMsg').innerText = "Failed to synchronize index layouts with GitHub API storage profiles.";
+        console.error("GitHub fetch failed:", error);
+        document.getElementById('loadingMsg').innerText = "Failed to sync with your GitHub cards folder.";
     }
 }
 
