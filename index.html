@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Showcase Hub</title>
+    <title>xq0b's finds</title>
     <style>
         :root {
             --mulebuy-color: #8c7ae6;
@@ -264,7 +264,7 @@
 </head>
 <body>
 
-    <h1 class="hub-heading">Live Showcase Hub</h1>
+    <h1 class="hub-heading">xq0b's finds</h1>
     
     <div class="card-grid" id="cardGrid">
         <div class="no-cards-msg" id="loadingMsg">Checking GitHub storage...</div>
@@ -309,7 +309,7 @@ const EXCHANGE_RATES = {
     GBP: 0.78
 };
 
-// Hardcoded repository pointers from your screenshots
+// Hardcoded repository configurations
 const GITHUB_USER = "mryeet9043";
 const GITHUB_REPO = "Kakobuy-spreadsheet";
 
@@ -317,7 +317,6 @@ async function autoLoadGitHubCards() {
     const gridContainer = document.getElementById('cardGrid');
 
     try {
-        // Query the GitHub API for your cards folder contents
         const apiResponse = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards`);
         
         if (!apiResponse.ok) {
@@ -335,7 +334,6 @@ async function autoLoadGitHubCards() {
 
         gridContainer.innerHTML = '';
 
-        // Fetch and parse every individual JSON file found
         for (const file of jsonFiles) {
             try {
                 const fileContentResponse = await fetch(file.download_url);
