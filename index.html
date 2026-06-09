@@ -335,15 +335,15 @@
     <h1 class="hub-heading">xq0b's finds</h1>
     
     <div class="category-nav">
-        <button class="tab-btn active" onclick="switchCategory('hoodies', this)">Hoodies</button>
-        <button class="tab-btn" onclick="switchCategory('jeans', this)">Jeans</button>
-        <button class="tab-btn" onclick="switchCategory('T-shirts', this)">T-Shirts</button>
-        <button class="tab-btn" onclick="switchCategory('shoes', this)">Shoes</button>
+        <button class="tab-btn active" id="igBrandsTab" onclick="switchCategory('IG-Brands', this)">IG Brands</button>
         <button class="tab-btn" onclick="switchCategory('accessories', this)">Accessories</button>
-        <button class="tab-btn" id="igBrandsTab" onclick="switchCategory('IG-Brands', this)">IG Brands</button>
+        <button class="tab-btn" onclick="switchCategory('hoodies', this)">Hoodies</button>
+        <button class="tab-btn" onclick="switchCategory('jeans', this)">Jeans</button>
+        <button class="tab-btn" onclick="switchCategory('shoes', this)">Shoes</button>
+        <button class="tab-btn" onclick="switchCategory('T-shirts', this)">T-Shirts</button>
     </div>
 
-    <div class="sub-nav" id="igSubNav">
+    <div class="sub-nav" id="igSubNav" style="display: flex;">
         <button class="sub-tab-btn active" onclick="switchSubCategory('hoodies', this)">Hoodies</button>
         <button class="sub-tab-btn" onclick="switchSubCategory('jeans', this)">Jeans</button>
         <button class="sub-tab-btn" onclick="switchSubCategory('T-shirts', this)">T-Shirts</button>
@@ -395,7 +395,7 @@ const EXCHANGE_RATES = {
 const GITHUB_USER = "mryeet9043";
 const GITHUB_REPO = "Kakobuy-spreadsheet";
 
-let currentMainCategory = "hoodies";
+let currentMainCategory = "IG-Brands";
 let currentSubCategory = "hoodies";
 
 async function findActualGitHubPath(targetPath) {
@@ -537,7 +537,8 @@ function closeVault(event) {
 }
 
 window.onload = () => {
-    loadCategoryCards("hoodies");
+    // Automatically load IG Brands on boot up
+    loadCategoryCards("IG-Brands/hoodies");
 };
 </script>
 
