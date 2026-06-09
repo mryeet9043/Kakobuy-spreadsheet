@@ -467,20 +467,6 @@ function changePrimaryCurrency() {
     globalUserPreferredCurrency = document.getElementById('currencySelect').value;
 }
 
-async function findActualGitHubPath(targetPath) {
-    const parts = targetPath.split('/');
-    let currentPath = 'cards';
-    for (const part of parts) {
-        const resp = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/currentPath`.replace('currentPath', currentPath));
-        if (!resp.ok) return null;
-        const items = await resp.json();
-        const matchedItem = items.find(i => i.name.toLowerCase() === part.toLowerCase());
-        if (!matchedItem) return null;
-        currentPath = currentPath + '/' + matchedItem.name;
-    }
-    return currentPath;
-}
-
 async function loadCategoryCards(relativePath) {
     const gridContainer = document.getElementById('cardGrid');
     gridContainer.innerHTML = `<div class="no-cards-msg" id="loadingMsg">Loading finds...</div>`;
@@ -488,14 +474,14 @@ async function loadCategoryCards(relativePath) {
     activeRawItemsArray = [];
 
     try {
-        const actualFolderDirectory = await findActualGitHubPath(relativePath);
-        if (!actualFolderDirectory) {
-            gridContainer.innerHTML = `<div class="no-cards-msg">Folder directory map layout error.</div>`;
+        // Direct, case-exact request URL maps cleanly to GitHub contents
+        const targetUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${relativePath}`;
+        const apiResponse = await fetch(targetUrl);
+        
+        if (!apiResponse.ok) {
+            gridContainer.innerHTML = `<div class="no-cards-msg">No items uploaded here yet.</div>`;
             return;
         }
-
-        const apiResponse = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${actualFolderDirectory}`);
-        if (!apiResponse.ok) return;
 
         const filesList = await apiResponse.json();
         const jsonFiles = filesList.filter(file => file.name.toLowerCase().endsWith('.json'));
