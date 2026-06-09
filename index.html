@@ -1,3 +1,12 @@
+To make the folder filtering completely bulletproof and **case-insensitive**, we can adjust the script to automatically convert all file paths and folder results to lowercase when communicating with GitHub.
+
+This means it won't matter if you name your folders `hoodies`, `Hoodies`, `IG-Brands`, or `ig-brands` on GitHub—the website will match them perfectly either way.
+
+Here is your updated, complete `index.html` file for your `Kakobuy-spreadsheet` repository:
+
+### Complete `index.html` (Case-Insensitive Folder Scanning)
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,7 +73,7 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        /* --- Sub-Category Menu (Hidden by default) --- */
+        /* --- Sub-Category Menu --- */
         .sub-nav {
             display: none;
             justify-content: center;
@@ -395,25 +404,50 @@ const GITHUB_USER = "mryeet9043";
 const GITHUB_REPO = "Kakobuy-spreadsheet";
 
 let currentMainCategory = "hoodies";
-let currentSubCategory = "hoodies"; // Tracks subfolders inside IG Brands
+let currentSubCategory = "hoodies";
 
-async function loadCategoryCards(pathName) {
+// Recursively scans the repo to find folders regardless of casing matching
+async function findActualGitHubPath(targetPath) {
+    const parts = targetPath.split('/');
+    let currentPath = 'cards';
+    
+    for (const part of parts) {
+        const resp = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${currentPath}`);
+        if (!resp.ok) return null;
+        const items = await resp.json();
+        
+        // Match name in lower case to guarantee case insensitivity
+        const matchedItem = items.find(i => i.name.toLowerCase() === part.toLowerCase());
+        if (!matchedItem) return null;
+        
+        currentPath = currentPath + '/' + matchedItem.name;
+    }
+    return currentPath;
+}
+
+async function loadCategoryCards(relativePath) {
     const gridContainer = document.getElementById('cardGrid');
     gridContainer.innerHTML = `<div class="no-cards-msg" id="loadingMsg">Loading finds...</div>`;
     
     loadedItemsStorage = {};
 
     try {
-        // Dynamic path router handles standard ('hoodies') or deep paths ('IG-Brands/hoodies')
-        const apiResponse = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${pathName}`);
+        // Resolve path to match whatever case configuration you saved on GitHub
+        const actualFolderDirectory = await findActualGitHubPath(relativePath);
         
+        if (!actualFolderDirectory) {
+            gridContainer.innerHTML = `<div class="no-cards-msg">Could not locate 'cards/${relativePath}/' folder directory. Check folder setup on GitHub.</div>`;
+            return;
+        }
+
+        const apiResponse = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${actualFolderDirectory}`);
         if (!apiResponse.ok) {
-            gridContainer.innerHTML = `<div class="no-cards-msg">Could not read folder path: 'cards/${pathName}/'. Verify the folder path structure on GitHub!</div>`;
+            gridContainer.innerHTML = `<div class="no-cards-msg">Error reading directory files contents.</div>`;
             return;
         }
 
         const filesList = await apiResponse.json();
-        const jsonFiles = filesList.filter(file => file.name.endsWith('.json'));
+        const jsonFiles = filesList.filter(file => file.name.toLowerCase().endsWith('.json'));
 
         if (jsonFiles.length === 0) {
             gridContainer.innerHTML = `<div class="no-cards-msg">No items uploaded here yet.</div>`;
@@ -441,7 +475,7 @@ async function loadCategoryCards(pathName) {
                 `;
                 gridContainer.insertAdjacentHTML('beforeend', cardHtml);
             } catch (err) {
-                console.error("Error structural parsing json input streams:", err);
+                console.error("Error payload structural loop mapping:", err);
             }
         }
     } catch (error) {
@@ -459,13 +493,10 @@ function switchCategory(categoryName, element) {
 
     const subNavElement = document.getElementById('igSubNav');
 
-    if (categoryName === 'IG-Brands') {
-        // Reveal nested sub-navigation options layout smoothly
+    if (categoryName.toLowerCase() === 'ig-brands') {
         subNavElement.style.display = 'flex';
-        // Force-load whatever sub-tab is currently marked active inside IG Brands
         loadCategoryCards(`IG-Brands/${currentSubCategory}`);
     } else {
-        // Collapse sub-navigation row entirely for clean layout
         subNavElement.style.display = 'none';
         loadCategoryCards(categoryName);
     }
@@ -478,7 +509,6 @@ function switchSubCategory(subCategoryName, element) {
     document.querySelectorAll('.sub-tab-btn').forEach(btn => btn.classList.remove('active'));
     element.classList.add('active');
 
-    // Query deep route e.g., 'IG-Brands/hoodies'
     loadCategoryCards(`IG-Brands/${subCategoryName}`);
 }
 
@@ -518,10 +548,11 @@ function closeVault(event) {
 }
 
 window.onload = () => {
-    // Initial start values point directly to root hoodies folder context
     loadCategoryCards("hoodies");
 };
 </script>
 
 </body>
 </html>
+
+```
