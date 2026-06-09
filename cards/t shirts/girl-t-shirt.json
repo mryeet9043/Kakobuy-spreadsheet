@@ -1,0 +1,13 @@
+{
+  "id": "item_girl-t-shirt",
+  "title": "GIRL T-shirt",
+  "price": 6.37,
+  "img": "https://img.alicdn.com/bao/uploaded/i1/2218252751209/O1CN01n8lm3U1KnlsHwUeT8_!!2218252751209.webp_400x400q85.jpg_.webp",
+  "links": {
+    "id": "883901502742",
+    "mulebuy": "https://mulebuy.com/product?id=883901502742&platform=TAOBAO",
+    "kakobuy": "https://www.kakobuy.com/item/details?url=https%3A%2F%2Fitem.taobao.com%2Fitem.htm%3Fid%3D883901502742&affcode=xq080910",
+    "litbuy": "https://litbuy.com/product/1/883901502742",
+    "oopbuy": "https://oopbuy.com/product/taobao/883901502742"
+  }
+}
