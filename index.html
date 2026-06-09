@@ -343,9 +343,9 @@
     </div>
 
     <div class="sub-nav" id="igSubNav">
-        <button class="sub-tab-btn active" onclick="switchSubCategory('hoodies', this)">IG Hoodies</button>
-        <button class="sub-tab-btn" onclick="switchSubCategory('jeans', this)">IG Jeans</button>
-        <button class="sub-tab-btn" onclick="switchSubCategory('T-shirts', this)">IG T-Shirts</button>
+        <button class="sub-tab-btn active" onclick="switchSubCategory('hoodies', this)">Hoodies</button>
+        <button class="sub-tab-btn" onclick="switchSubCategory('jeans', this)">Jeans</button>
+        <button class="sub-tab-btn" onclick="switchSubCategory('T-shirts', this)">T-Shirts</button>
     </div>
     
     <div class="card-grid" id="cardGrid">
@@ -397,17 +397,15 @@ const GITHUB_REPO = "Kakobuy-spreadsheet";
 let currentMainCategory = "hoodies";
 let currentSubCategory = "hoodies";
 
-// Recursively scans the repo to find folders regardless of casing matching
 async function findActualGitHubPath(targetPath) {
     const parts = targetPath.split('/');
     let currentPath = 'cards';
     
     for (const part of parts) {
-        const resp = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${currentPath}`);
+        const resp = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/currentPath`.replace('currentPath', currentPath));
         if (!resp.ok) return null;
         const items = await resp.json();
         
-        // Match name in lower case to guarantee case insensitivity
         const matchedItem = items.find(i => i.name.toLowerCase() === part.toLowerCase());
         if (!matchedItem) return null;
         
@@ -423,7 +421,6 @@ async function loadCategoryCards(relativePath) {
     loadedItemsStorage = {};
 
     try {
-        // Resolve path to match whatever case configuration you saved on GitHub
         const actualFolderDirectory = await findActualGitHubPath(relativePath);
         
         if (!actualFolderDirectory) {
