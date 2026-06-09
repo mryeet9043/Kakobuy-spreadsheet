@@ -13,6 +13,8 @@
             --bg-main: #f4f6f9;
             --card-bg: #fff;
             --vault-bg: #f5f5f7;
+            --tab-active: #111;
+            --tab-inactive: #b5b5b5;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -22,14 +24,80 @@
             padding: 40px 20px;
         }
         
-        /* --- Showcase Layout Grid --- */
         .hub-heading {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             color: #2f3640;
-            font-size: 28px;
-            font-weight: 700;
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
         }
+
+        /* --- Main Category Tab Layout --- */
+        .category-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: white;
+            border: 1px solid #e1e0de;
+            color: var(--tab-inactive);
+            padding: 10px 22px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .tab-btn:hover {
+            color: #111;
+            border-color: #111;
+        }
+        .tab-btn.active {
+            background: var(--tab-active);
+            color: white;
+            border-color: var(--tab-active);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* --- Sub-Category Menu (Hidden by default) --- */
+        .sub-nav {
+            display: none;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 35px;
+            animation: fadeInDown 0.25s ease-out;
+            flex-wrap: wrap;
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .sub-tab-btn {
+            background: #e9e8e6;
+            border: none;
+            color: #555;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .sub-tab-btn:hover {
+            background: #ddd;
+            color: #111;
+        }
+        .sub-tab-btn.active {
+            background: #2e86de;
+            color: white;
+        }
+
+        /* --- Showcase Layout Grid --- */
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -266,8 +334,22 @@
 
     <h1 class="hub-heading">xq0b's finds</h1>
     
+    <div class="category-nav">
+        <button class="tab-btn active" onclick="switchCategory('hoodies', this)">Hoodies</button>
+        <button class="tab-btn" onclick="switchCategory('jeans', this)">Jeans</button>
+        <button class="tab-btn" onclick="switchCategory('T-shirts', this)">T-Shirts</button>
+        <button class="tab-btn" onclick="switchCategory('shoes', this)">Shoes</button>
+        <button class="tab-btn" id="igBrandsTab" onclick="switchCategory('IG-Brands', this)">IG Brands</button>
+    </div>
+
+    <div class="sub-nav" id="igSubNav">
+        <button class="sub-tab-btn active" onclick="switchSubCategory('hoodies', this)">IG Hoodies</button>
+        <button class="sub-tab-btn" onclick="switchSubCategory('jeans', this)">IG Jeans</button>
+        <button class="sub-tab-btn" onclick="switchSubCategory('T-shirts', this)">IG T-Shirts</button>
+    </div>
+    
     <div class="card-grid" id="cardGrid">
-        <div class="no-cards-msg" id="loadingMsg">Checking GitHub storage...</div>
+        <div class="no-cards-msg" id="loadingMsg">Loading configuration folders...</div>
     </div>
 
     <div class="modal-overlay" id="vaultModal" onclick="closeVault(event)">
@@ -309,18 +391,24 @@ const EXCHANGE_RATES = {
     GBP: 0.78
 };
 
-// Hardcoded repository configurations
 const GITHUB_USER = "mryeet9043";
 const GITHUB_REPO = "Kakobuy-spreadsheet";
 
-async function autoLoadGitHubCards() {
+let currentMainCategory = "hoodies";
+let currentSubCategory = "hoodies"; // Tracks subfolders inside IG Brands
+
+async function loadCategoryCards(pathName) {
     const gridContainer = document.getElementById('cardGrid');
+    gridContainer.innerHTML = `<div class="no-cards-msg" id="loadingMsg">Loading finds...</div>`;
+    
+    loadedItemsStorage = {};
 
     try {
-        const apiResponse = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards`);
+        // Dynamic path router handles standard ('hoodies') or deep paths ('IG-Brands/hoodies')
+        const apiResponse = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${pathName}`);
         
         if (!apiResponse.ok) {
-            gridContainer.innerHTML = `<div class="no-cards-msg">Could not find your 'cards/' folder. Please ensure it contains your .json files.</div>`;
+            gridContainer.innerHTML = `<div class="no-cards-msg">Could not read folder path: 'cards/${pathName}/'. Verify the folder path structure on GitHub!</div>`;
             return;
         }
 
@@ -328,7 +416,7 @@ async function autoLoadGitHubCards() {
         const jsonFiles = filesList.filter(file => file.name.endsWith('.json'));
 
         if (jsonFiles.length === 0) {
-            gridContainer.innerHTML = `<div class="no-cards-msg">Your 'cards/' folder is empty. Upload your JSON files to see them here!</div>`;
+            gridContainer.innerHTML = `<div class="no-cards-msg">No items uploaded here yet.</div>`;
             return;
         }
 
@@ -353,13 +441,45 @@ async function autoLoadGitHubCards() {
                 `;
                 gridContainer.insertAdjacentHTML('beforeend', cardHtml);
             } catch (err) {
-                console.error("Error formatting JSON item:", err);
+                console.error("Error structural parsing json input streams:", err);
             }
         }
     } catch (error) {
-        console.error("GitHub fetch failed:", error);
-        document.getElementById('loadingMsg').innerText = "Failed to sync with your GitHub cards folder.";
+        console.error("GitHub transmission processing failure:", error);
+        gridContainer.innerHTML = `<div class="no-cards-msg">Failed to securely download assets index maps from GitHub.</div>`;
     }
+}
+
+function switchCategory(categoryName, element) {
+    if(currentMainCategory === categoryName && categoryName !== 'IG-Brands') return;
+    currentMainCategory = categoryName;
+
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+
+    const subNavElement = document.getElementById('igSubNav');
+
+    if (categoryName === 'IG-Brands') {
+        // Reveal nested sub-navigation options layout smoothly
+        subNavElement.style.display = 'flex';
+        // Force-load whatever sub-tab is currently marked active inside IG Brands
+        loadCategoryCards(`IG-Brands/${currentSubCategory}`);
+    } else {
+        // Collapse sub-navigation row entirely for clean layout
+        subNavElement.style.display = 'none';
+        loadCategoryCards(categoryName);
+    }
+}
+
+function switchSubCategory(subCategoryName, element) {
+    if(currentSubCategory === subCategoryName) return;
+    currentSubCategory = subCategoryName;
+
+    document.querySelectorAll('.sub-tab-btn').forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+
+    // Query deep route e.g., 'IG-Brands/hoodies'
+    loadCategoryCards(`IG-Brands/${subCategoryName}`);
 }
 
 function openVaultModal(cardId) {
@@ -397,7 +517,10 @@ function closeVault(event) {
     }
 }
 
-window.onload = autoLoadGitHubCards;
+window.onload = () => {
+    // Initial start values point directly to root hoodies folder context
+    loadCategoryCards("hoodies");
+};
 </script>
 
 </body>
