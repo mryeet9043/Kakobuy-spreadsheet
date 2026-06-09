@@ -363,7 +363,7 @@
                 <img id="themeIcon" src="lightmodeicon.png" alt="Theme">
             </button>
             <button class="control-btn" onclick="openSettings()" title="Settings & QOL Options">
-                <img id="settingsIcon" src="darkmodeicon.png" alt="Settings">
+                <img id="settingsIcon" src="lightmodeicon.png" alt="Settings" style="transform: rotate(45deg);">
             </button>
         </div>
     </div>
@@ -467,18 +467,28 @@ function changePrimaryCurrency() {
     globalUserPreferredCurrency = document.getElementById('currencySelect').value;
 }
 
-async function findActualGitHubPath(targetPath) {
-    const parts = targetPath.split('/');
-    let currentPath = 'cards';
-    for (const part of parts) {
-        const resp = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/currentPath`.replace('currentPath', currentPath));
-        if (!resp.ok) return null;
-        const items = await resp.json();
-        const matchedItem = items.find(i => i.name.toLowerCase() === part.toLowerCase());
-        if (!matchedItem) return null;
-        currentPath = currentPath + '/' + matchedItem.name;
+// Case logic queries with immediate path alternatives to catch both variations
+async function fetchWithCaseFallback(path) {
+    const directUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${path}`;
+    let response = await fetch(directUrl);
+    if (response.ok) return response;
+
+    // Checks Title Case variants (e.g. accessories -> Accessories)
+    let fallbackPath = path;
+    if (path.includes('/')) {
+        let parts = path.split('/');
+        fallbackPath = parts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('/');
+    } else {
+        fallbackPath = path.charAt(0).toUpperCase() + path.slice(1);
     }
-    return currentPath;
+    
+    const fallbackUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${fallbackPath}`;
+    response = await fetch(fallbackUrl);
+    if (response.ok) return response;
+    
+    // Checks lowercase variants
+    const lowerUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${path.toLowerCase()}`;
+    return await fetch(lowerUrl);
 }
 
 async function loadCategoryCards(relativePath) {
@@ -488,14 +498,12 @@ async function loadCategoryCards(relativePath) {
     activeRawItemsArray = [];
 
     try {
-        const actualFolderDirectory = await findActualGitHubPath(relativePath);
-        if (!actualFolderDirectory) {
-            gridContainer.innerHTML = `<div class="no-cards-msg">Folder directory map layout error.</div>`;
+        const apiResponse = await fetchWithCaseFallback(relativePath);
+        
+        if (!apiResponse.ok) {
+            gridContainer.innerHTML = `<div class="no-cards-msg">No items uploaded here yet.</div>`;
             return;
         }
-
-        const apiResponse = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${actualFolderDirectory}`);
-        if (!apiResponse.ok) return;
 
         const filesList = await apiResponse.json();
         const jsonFiles = filesList.filter(file => file.name.toLowerCase().endsWith('.json'));
@@ -545,6 +553,7 @@ function renderCustomFilteredGrid(itemsList) {
     });
 }
 
+// Real-time grid rendering query
 function filterGridCards() {
     const query = document.getElementById('searchFilterInput').value.trim().toLowerCase();
     if(!query) {
@@ -563,7 +572,7 @@ function switchCategory(categoryName, element) {
     document.getElementById('searchFilterInput').value = '';
 
     const subNavElement = document.getElementById('igSubNav');
-    if (categoryName.toLowerCase() === 'ig-brands') {
+    if (categoryName === 'IG-Brands') {
         subNavElement.style.display = 'flex';
         loadCategoryCards(`IG-Brands/${currentSubCategory}`);
     } else {
