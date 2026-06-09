@@ -47,7 +47,7 @@
             transition: background 0.3s ease, color 0.3s ease;
         }
         
-        /* --- Upper Header Actions Hub (Centered Layout) --- */
+        /* --- Upper Header Actions Hub --- */
         .header-container {
             max-width: 1200px;
             margin: 0 auto 30px auto;
@@ -461,19 +461,17 @@ function changePrimaryCurrency() {
     globalUserPreferredCurrency = document.getElementById('currencySelect').value;
 }
 
-// Fixed variable replacement issue inside path evaluation
-async function findActualGitHubPath(targetPath) {
-    const parts = targetPath.split('/');
-    let currentPath = 'cards';
-    for (const part of parts) {
-        const resp = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${currentPath}`);
-        if (!resp.ok) return null;
-        const items = await resp.json();
-        const matchedItem = items.find(i => i.name.toLowerCase() === part.toLowerCase());
-        if (!matchedItem) return null;
-        currentPath = currentPath + '/' + matchedItem.name;
+// Bypasses path looping and checks exact target location + alternate lowercased fallback patterns directly
+async function fetchDirectoryContents(relativePath) {
+    const primaryUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${relativePath}`;
+    let resp = await fetch(primaryUrl);
+    
+    if (!resp.ok) {
+        // Fallback option just in case GitHub directory structural matching layout is strictly lowercase
+        const secondaryUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${relativePath.toLowerCase()}`;
+        resp = await fetch(secondaryUrl);
     }
-    return currentPath;
+    return resp;
 }
 
 async function loadCategoryCards(relativePath) {
@@ -483,14 +481,12 @@ async function loadCategoryCards(relativePath) {
     activeRawItemsArray = [];
 
     try {
-        const actualFolderDirectory = await findActualGitHubPath(relativePath);
-        if (!actualFolderDirectory) {
-            gridContainer.innerHTML = `<div class="no-cards-msg">Could not locate '${relativePath}' folder directory. Check folder setup on GitHub.</div>`;
+        const apiResponse = await fetchDirectoryContents(relativePath);
+        
+        if (!apiResponse.ok) {
+            gridContainer.innerHTML = `<div class="no-cards-msg">Could not locate 'cards/${relativePath}' folder directory. Check folder setup on GitHub.</div>`;
             return;
         }
-
-        const apiResponse = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${actualFolderDirectory}`);
-        if (!apiResponse.ok) return;
 
         const filesList = await apiResponse.json();
         const jsonFiles = filesList.filter(file => file.name.toLowerCase().endsWith('.json'));
