@@ -22,7 +22,7 @@
             --border-color: #2c3540;
             --nav-bg: #11141a;
             --sub-bg: #1f2833;
-            --invert-val: 1; /* Inverts dark asset icons to crisp white on dark bg */
+            --invert-val: 0; /* Keeps white icons on dark background */
         }
 
         [data-theme="light"] {
@@ -37,7 +37,7 @@
             --border-color: #e1e0de;
             --nav-bg: #ffffff;
             --sub-bg: #e9e8e6;
-            --invert-val: 0; /* Keeps asset icons dark on light bg */
+            --invert-val: 1; /* Inverts white icons to black on light background */
         }
         
         body {
@@ -90,10 +90,10 @@
             border-color: var(--tab-inactive);
             transform: scale(1.05);
         }
-        .control-btn img, .control-btn svg {
-            width: 22px;
-            height: 22px;
-            filter: invert(var(--invert-val));
+        .control-btn img {
+            width: 20px;
+            height: 20px;
+            filter: invert(var(--invert-val)) !important;
             transition: filter 0.3s ease;
         }
 
@@ -360,13 +360,10 @@
         <h1 class="hub-heading">xq0b's finds</h1>
         <div class="utility-controls">
             <button class="control-btn" onclick="toggleTheme()" title="Toggle Theme">
-                <img id="themeIcon" src="lightmodeicon.png" alt="Theme">
+                <img id="themeIcon" src="https://img.icons8.com/ios-filled/50/eclipse-anomalies.png" alt="Theme">
             </button>
             <button class="control-btn" onclick="openSettings()" title="Settings & QOL Options">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                </svg>
+                <img id="settingsIcon" src="https://img.icons8.com/ios-filled/50/settings.png" alt="Settings">
             </button>
         </div>
     </div>
@@ -445,21 +442,11 @@ let currentMainCategory = "IG-Brands";
 let currentSubCategory = "hoodies";
 let globalUserPreferredCurrency = "USD";
 
-function updateToggleIcon(theme) {
-    const iconImg = document.getElementById('themeIcon');
-    if (theme === 'light') {
-        iconImg.src = 'darkmodeicon.png';
-    } else {
-        iconImg.src = 'lightmodeicon.png';
-    }
-}
-
 function toggleTheme() {
     const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
     const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', nextTheme);
     localStorage.setItem('user-theme', nextTheme);
-    updateToggleIcon(nextTheme);
 }
 
 function openSettings() {
@@ -470,10 +457,18 @@ function changePrimaryCurrency() {
     globalUserPreferredCurrency = document.getElementById('currencySelect').value;
 }
 
-// Queries GitHub repository using case rules matching your layout snapshot
-async function fetchCategoryContents(path) {
-    const targetUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${path}`;
-    return await fetch(targetUrl);
+async function findActualGitHubPath(targetPath) {
+    const parts = targetPath.split('/');
+    let currentPath = 'cards';
+    for (const part of parts) {
+        const resp = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/currentPath`.replace('currentPath', currentPath));
+        if (!resp.ok) return null;
+        const items = await resp.json();
+        const matchedItem = items.find(i => i.name.toLowerCase() === part.toLowerCase());
+        if (!matchedItem) return null;
+        currentPath = currentPath + '/' + matchedItem.name;
+    }
+    return currentPath;
 }
 
 async function loadCategoryCards(relativePath) {
@@ -483,12 +478,14 @@ async function loadCategoryCards(relativePath) {
     activeRawItemsArray = [];
 
     try {
-        const apiResponse = await fetchCategoryContents(relativePath);
-        
-        if (!apiResponse.ok) {
-            gridContainer.innerHTML = `<div class="no-cards-msg">No items uploaded here yet.</div>`;
+        const actualFolderDirectory = await findActualGitHubPath(relativePath);
+        if (!actualFolderDirectory) {
+            gridContainer.innerHTML = `<div class="no-cards-msg">Folder directory map layout error.</div>`;
             return;
         }
+
+        const apiResponse = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${actualFolderDirectory}`);
+        if (!apiResponse.ok) return;
 
         const filesList = await apiResponse.json();
         const jsonFiles = filesList.filter(file => file.name.toLowerCase().endsWith('.json'));
@@ -556,7 +553,7 @@ function switchCategory(categoryName, element) {
     document.getElementById('searchFilterInput').value = '';
 
     const subNavElement = document.getElementById('igSubNav');
-    if (categoryName === 'IG-Brands') {
+    if (categoryName.toLowerCase() === 'ig-brands') {
         subNavElement.style.display = 'flex';
         loadCategoryCards(`IG-Brands/${currentSubCategory}`);
     } else {
@@ -617,9 +614,6 @@ function closeVault(event, modalId) {
 window.onload = () => {
     const savedTheme = localStorage.getItem('user-theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
-    updateToggleIcon(savedTheme);
-    
-    // Ensure you have subfolders inside /cards/IG-Brands/ matching these exact names
     loadCategoryCards("IG-Brands/hoodies");
 };
 </script>
