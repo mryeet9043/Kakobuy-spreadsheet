@@ -10,160 +10,78 @@
             --kakobuy-color: #ff6b6b;
             --litbuy-color: #ff7f50;
             --oopbuy-color: #2e86de;
-            
-            /* Dark Mode Base Constants */
-            --bg-main: #0b0c10;
-            --card-bg: #1f2833;
-            --vault-bg: #151a22;
-            --text-main: #c5c6c7;
-            --text-bright: #ffffff;
-            --tab-active: #ffffff;
-            --tab-inactive: #4f5d75;
-            --border-color: #2c3540;
-            --nav-bg: #11141a;
-            --sub-bg: #1f2833;
-            --icon-invert: invert(1);
-        }
-
-        [data-theme="light"] {
-            /* Light Mode Constants */
             --bg-main: #f4f6f9;
-            --card-bg: #ffffff;
-            --vault-bg: #fcfbfa;
-            --text-main: #555555;
-            --text-bright: #111111;
-            --tab-active: #111111;
+            --card-bg: #fff;
+            --vault-bg: #f5f5f7;
+            --tab-active: #111;
             --tab-inactive: #b5b5b5;
-            --border-color: #e1e0de;
-            --nav-bg: #ffffff;
-            --sub-bg: #e9e8e6;
-            --icon-invert: invert(0);
         }
-        
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-main);
-            color: var(--text-main);
+            color: #111;
             margin: 0;
             padding: 40px 20px;
-            transition: background 0.3s ease, color 0.3s ease;
         }
         
-        /* --- Upper Header Actions Hub --- */
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto 30px auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            position: relative;
-        }
         .hub-heading {
-            margin: 0;
-            color: var(--text-bright);
-            font-size: 36px;
-            font-weight: 900;
-            letter-spacing: -1px;
-            text-transform: uppercase;
             text-align: center;
-        }
-        .utility-controls {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-        .control-btn {
-            background: var(--nav-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-bright);
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        .control-btn:hover {
-            border-color: var(--tab-inactive);
-            transform: scale(1.02);
-        }
-
-        /* --- Image-driven Theme Toggle Adjustments --- */
-        .theme-toggle-img-btn {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--nav-bg);
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .theme-toggle-img-btn:hover {
-            border-color: var(--tab-inactive);
-            transform: scale(1.05);
-        }
-        .theme-toggle-img-btn img {
-            width: 22px;
-            height: 22px;
-            object-fit: contain;
-            filter: var(--icon-invert);
-            transition: filter 0.3s ease;
+            margin-bottom: 25px;
+            color: #2f3640;
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
         }
 
         /* --- Main Category Tab Layout --- */
         .category-nav {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 12px;
+            margin-bottom: 15px;
             flex-wrap: wrap;
         }
         .tab-btn {
-            background: var(--nav-bg);
-            border: 1px solid var(--border-color);
+            background: white;
+            border: 1px solid #e1e0de;
             color: var(--tab-inactive);
-            padding: 12px 26px;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 13px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+            padding: 10px 22px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 14px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
         }
         .tab-btn:hover {
-            color: var(--text-bright);
-            background: var(--vault-bg);
+            color: #111;
+            border-color: #111;
         }
         .tab-btn.active {
             background: var(--tab-active);
-            color: var(--bg-main);
+            color: white;
             border-color: var(--tab-active);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         /* --- Sub-Category Menu --- */
         .sub-nav {
             display: none;
             justify-content: center;
-            gap: 12px;
-            margin-bottom: 30px;
+            gap: 10px;
+            margin-bottom: 35px;
+            animation: fadeInDown 0.25s ease-out;
             flex-wrap: wrap;
         }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         .sub-tab-btn {
-            background: var(--sub-bg);
-            border: 1px solid transparent;
-            color: var(--text-main);
-            padding: 8px 20px;
+            background: #e9e8e6;
+            border: none;
+            color: #555;
+            padding: 6px 16px;
             border-radius: 20px;
             font-weight: 600;
             font-size: 12px;
@@ -171,61 +89,42 @@
             transition: all 0.2s ease;
         }
         .sub-tab-btn:hover {
-            background: var(--border-color);
-            color: var(--text-bright);
+            background: #ddd;
+            color: #111;
         }
         .sub-tab-btn.active {
             background: #2e86de;
             color: white;
         }
 
-        /* --- Permanent Search Bar Container --- */
-        .search-wrapper {
-            max-width: 500px;
-            margin: 0 auto 35px auto;
-            display: block;
-        }
-        .search-input {
-            width: 100%;
-            padding: 12px 20px;
-            background: var(--nav-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-bright);
-            border-radius: 25px;
-            font-size: 14px;
-            box-sizing: border-box;
-            outline: none;
-            text-align: center;
-        }
-
         /* --- Showcase Layout Grid --- */
         .card-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 30px;
-            max-width: 1200px;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            max-width: 1100px;
             margin: 0 auto;
         }
         
         .preview-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            transition: all 0.3s ease;
+            transition: transform 0.2s, box-shadow 0.2s;
             cursor: pointer;
             user-select: none;
         }
         .preview-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(-4px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
         }
         .card-img-wrap {
             width: 100%;
-            height: 240px;
-            background: var(--bg-main);
+            height: 200px;
+            background: #eee;
             overflow: hidden;
         }
         .card-img-wrap img {
@@ -234,37 +133,30 @@
             object-fit: cover;
         }
         .card-content {
-            padding: 22px 18px;
+            padding: 20px 15px;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
         }
         .card-title {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
-            margin: 0 0 12px 0;
-            color: var(--text-bright);
+            margin: 0;
+            color: #111;
             line-height: 1.4;
-            height: 42px;
-            overflow: hidden;
-        }
-        .card-tag {
-            align-self: flex-start;
-            font-size: 11px;
-            text-transform: uppercase;
-            font-weight: 700;
-            background: rgba(128,128,128,0.1);
-            color: var(--tab-inactive);
-            padding: 4px 10px;
-            border-radius: 6px;
         }
 
-        /* --- Universal Modal Structural Base Style --- */
+        /* --- Perfectly Sized Square Frame Modal Window --- */
         .modal-overlay {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(6px);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
             display: none;
             justify-content: center;
             align-items: center;
@@ -273,17 +165,18 @@
             box-sizing: border-box;
         }
         .vault-container {
-            background-color: var(--vault-bg);
-            border: 1px solid var(--border-color);
+            background-color: #fcfbfa;
             width: 580px;            
             height: 520px;           
             border-radius: 24px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
             padding: 24px;
             box-sizing: border-box;
             overflow: hidden;        
             display: flex;
             flex-direction: column;
-            animation: slideUp 0.25s ease-out;
+            position: relative;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         @keyframes slideUp {
             from { transform: translateY(15px); opacity: 0; }
@@ -297,25 +190,33 @@
             flex-shrink: 0;
         }
         .vault-title {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
             margin: 0;
-            color: var(--text-bright);
+            letter-spacing: -0.5px;
+            color: #111;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 380px;
+            max-width: 400px;
         }
         .btn-close-vault {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-bright);
+            background: white;
+            border: 1px solid #e1e0de;
+            color: #111;
             padding: 8px 16px;
             border-radius: 20px;
             font-weight: 600;
+            font-size: 13px;
             cursor: pointer;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+        .btn-close-vault:hover {
+            background: #f5f5f7;
         }
         
+        /* Two-column layout */
         .vault-split-view {
             display: grid;
             grid-template-columns: 240px 1fr;
@@ -323,110 +224,152 @@
             flex-grow: 1;
             min-height: 0; 
         }
-        .vault-left-col { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+        
+        .vault-left-col {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 0;
+        }
         .vault-main-img {
-            width: 100%; height: 240px; background: #000; border-radius: 16px; overflow: hidden;
-            border: 1px solid var(--border-color); flex-shrink: 0;
+            width: 100%;
+            height: 240px;
+            background: #e9e8e6;
+            border-radius: 16px;
+            overflow: hidden;
+            flex-shrink: 0;
         }
-        .vault-main-img img { width: 100%; height: 100%; object-fit: cover; }
-        .agent-buttons-stack { display: flex; flex-direction: column; gap: 6px; }
+        .vault-main-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .agent-buttons-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
         .vault-agent-btn {
-            display: block; text-align: center; padding: 9px; color: white; text-decoration: none;
-            font-weight: bold; border-radius: 10px; font-size: 13px;
+            display: block;
+            text-align: center;
+            padding: 9px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 10px;
+            font-size: 13px;
+            transition: opacity 0.2s;
+            flex-shrink: 0;
         }
+        .vault-agent-btn:hover { opacity: 0.9; }
         .v-kakobuy { background-color: var(--kakobuy-color); }
         .v-mulebuy { background-color: var(--mulebuy-color); }
         .v-litbuy { background-color: var(--litbuy-color); }
         .v-oopbuy { background-color: var(--oopbuy-color); }
 
-        .vault-right-col { display: flex; flex-direction: column; min-height: 0; }
+        /* Right Column Details */
+        .vault-right-col {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
         .vault-pricing-box {
-            background: var(--card-bg); border: 1px solid var(--border-color);
-            border-radius: 16px; padding: 16px; height: 100%; display: flex; flex-direction: column;
-        }
-        .vault-price-container { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-        .vault-price-badge { color: var(--text-bright); font-weight: 800; font-size: 26px; }
-        .vault-currency-conversions { font-size: 14px; color: var(--text-main); text-align: right; line-height: 1.6; }
-
-        /* --- Settings Layout Window Elements --- */
-        .settings-row {
-            margin-bottom: 5px;
-        }
-        .settings-row label {
-            display: block;
-            font-weight: bold;
-            color: var(--text-bright);
-            margin-bottom: 12px;
-            font-size: 14px;
-        }
-        .settings-select {
-            width: 100%;
-            padding: 10px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-bright);
-            border-radius: 8px;
-            outline: none;
+            background: white;
+            border: 1px solid #e9e8e6;
+            border-radius: 16px;
+            padding: 16px;
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; 
         }
 
-        .no-cards-msg { text-align: center; grid-column: 1 / -1; color: var(--tab-inactive); padding: 40px; }
+        /* Price block Style */
+        .vault-price-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end; 
+            gap: 6px;
+        }
+        .vault-price-badge {
+            background: transparent;
+            color: #111;
+            font-weight: 700;
+            font-size: 24px;
+        }
+        .vault-currency-conversions {
+            font-size: 13px;
+            color: #111;
+            text-align: right;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .no-cards-msg {
+            text-align: center;
+            grid-column: 1 / -1;
+            color: #777;
+            padding: 40px;
+            font-size: 16px;
+        }
+
         @media (max-width: 620px) {
-            .vault-container { width: 95%; height: auto; max-height: 95vh; overflow-y: auto; }
-            .vault-split-view { grid-template-columns: 1fr; }
-            .vault-main-img { height: 180px; }
+            .vault-container {
+                width: 95%;
+                height: auto;
+                max-height: 95vh;
+                overflow-y: auto;
+            }
+            .vault-split-view {
+                grid-template-columns: 1fr;
+            }
+            .vault-main-img {
+                height: 180px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="header-container">
-        <h1 class="hub-heading">xq0b's finds</h1>
-        <div class="utility-controls">
-            <button class="theme-toggle-img-btn" id="themeTogglerBtn" onclick="toggleTheme()" title="Switch View Theme">
-                <img id="themeIconImage" src="lightmodeicon.png" alt="Theme Icon">
-            </button>
-            
-            <button class="control-btn" onclick="openSettings()" title="Settings & QOL Options" style="padding: 10px; border-radius: 50%; width: 36px; height: 36px;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                </svg>
-            </button>
-        </div>
-    </div>
+    <h1 class="hub-heading">xq0b's finds</h1>
     
     <div class="category-nav">
-        <button class="tab-btn active" id="igBrandsTab" onclick="switchCategory('ig brands', this)">IG Brands</button>
-        <button class="tab-btn" onclick="switchCategory('accessories', this)">Accessories</button>
-        <button class="tab-btn" onclick="switchCategory('hoodies', this)">Hoodies</button>
+        <button class="tab-btn active" onclick="switchCategory('hoodies', this)">Hoodies</button>
         <button class="tab-btn" onclick="switchCategory('jeans', this)">Jeans</button>
+        <button class="tab-btn" onclick="switchCategory('T-shirts', this)">T-Shirts</button>
         <button class="tab-btn" onclick="switchCategory('shoes', this)">Shoes</button>
-        <button class="tab-btn" onclick="switchCategory('t shirts', this)">T-Shirts</button>
+        <button class="tab-btn" onclick="switchCategory('accessories', this)">Accessories</button>
+        <button class="tab-btn" id="igBrandsTab" onclick="switchCategory('IG-Brands', this)">IG Brands</button>
     </div>
 
-    <div class="sub-nav" id="igSubNav" style="display: flex;">
+    <div class="sub-nav" id="igSubNav">
         <button class="sub-tab-btn active" onclick="switchSubCategory('hoodies', this)">Hoodies</button>
         <button class="sub-tab-btn" onclick="switchSubCategory('jeans', this)">Jeans</button>
-        <button class="sub-tab-btn" onclick="switchSubCategory('t shirts', this)">T-Shirts</button>
-    </div>
-
-    <div class="search-wrapper" id="searchWrapper">
-        <input type="text" class="search-input" id="searchFilterInput" placeholder="🔍 Search this folder..." oninput="filterGridCards()">
+        <button class="sub-tab-btn" onclick="switchSubCategory('T-shirts', this)">T-Shirts</button>
     </div>
     
-    <div class="card-grid" id="cardGrid"></div>
+    <div class="card-grid" id="cardGrid">
+        <div class="no-cards-msg" id="loadingMsg">Loading configuration folders...</div>
+    </div>
 
-    <div class="modal-overlay" id="vaultModal" onclick="closeVault(event, 'vaultModal')">
+    <div class="modal-overlay" id="vaultModal" onclick="closeVault(event)">
         <div class="vault-container" onclick="event.stopPropagation()">
+            
             <div class="vault-header">
                 <h1 class="vault-title" id="vTitle">Product Title</h1>
-                <button class="btn-close-vault" onclick="document.getElementById('vaultModal').style.display='none'">Close</button>
+                <button class="btn-close-vault" onclick="closeVault(null)">Close</button>
             </div>
+
             <div class="vault-split-view">
+                
                 <div class="vault-left-col">
-                    <div class="vault-main-img"><img id="vImg" src="" alt="Preview"></div>
+                    <div class="vault-main-img">
+                        <img id="vImg" src="" alt="Main Preview">
+                    </div>
                     <div class="agent-buttons-stack" id="vAgentStack"></div>
                 </div>
+                
                 <div class="vault-right-col">
                     <div class="vault-pricing-box">
                         <div class="vault-price-container">
@@ -435,89 +378,72 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="modal-overlay" id="settingsModal" onclick="closeVault(event, 'settingsModal')">
-        <div class="vault-container" style="height: auto; max-width: 420px;">
-            <div class="vault-header">
-                <h1 class="vault-title">Storefront Settings</h1>
-                <button class="btn-close-vault" onclick="document.getElementById('settingsModal').style.display='none'">Save</button>
-            </div>
-            <div class="settings-row">
-                <label for="currencySelect">Preferred Top Badge Currency</label>
-                <select id="currencySelect" class="settings-select" onchange="changePrimaryCurrency()">
-                    <option value="USD">USD ($)</option>
-                    <option value="CNY">CNY (¥)</option>
-                    <option value="EUR">EUR (€)</option>
-                    <option value="GBP">GBP (£)</option>
-                </select>
             </div>
         </div>
     </div>
 
 <script>
 let loadedItemsStorage = {};
-let activeRawItemsArray = [];
 
-const EXCHANGE_RATES = { CNY: 7.24, EUR: 0.92, GBP: 0.78 };
+const EXCHANGE_RATES = {
+    CNY: 7.24,
+    EUR: 0.92,
+    GBP: 0.78
+};
+
 const GITHUB_USER = "mryeet9043";
 const GITHUB_REPO = "Kakobuy-spreadsheet";
 
-let currentMainCategory = "ig brands";
+let currentMainCategory = "hoodies";
 let currentSubCategory = "hoodies";
-let globalUserPreferredCurrency = "USD";
 
-function updateToggleVisualAssets(theme) {
-    const iconImg = document.getElementById('themeIconImage');
-    if (!iconImg) return;
-    iconImg.src = (theme === 'light') ? 'darkmodeicon.png' : 'lightmodeicon.png';
-}
-
-function toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-    const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', nextTheme);
-    localStorage.setItem('user-theme', nextTheme);
-    updateToggleVisualAssets(nextTheme);
-}
-
-function openSettings() {
-    document.getElementById('settingsModal').style.display = 'flex';
-}
-
-function changePrimaryCurrency() {
-    globalUserPreferredCurrency = document.getElementById('currencySelect').value;
+async function findActualGitHubPath(targetPath) {
+    const parts = targetPath.split('/');
+    let currentPath = 'cards';
+    
+    for (const part of parts) {
+        const resp = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/currentPath`.replace('currentPath', currentPath));
+        if (!resp.ok) return null;
+        const items = await resp.json();
+        
+        const matchedItem = items.find(i => i.name.toLowerCase() === part.toLowerCase());
+        if (!matchedItem) return null;
+        
+        currentPath = currentPath + '/' + matchedItem.name;
+    }
+    return currentPath;
 }
 
 async function loadCategoryCards(relativePath) {
     const gridContainer = document.getElementById('cardGrid');
     gridContainer.innerHTML = `<div class="no-cards-msg" id="loadingMsg">Loading finds...</div>`;
+    
     loadedItemsStorage = {};
-    activeRawItemsArray = [];
-
-    // URL-encodes paths so folders with spaces (like "ig brands") are correctly understood by the GitHub API
-    const cleanedPath = encodeURIComponent(relativePath.toLowerCase());
 
     try {
-        const primaryUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${cleanedPath}`;
-        const apiResponse = await fetch(primaryUrl);
+        const actualFolderDirectory = await findActualGitHubPath(relativePath);
         
+        if (!actualFolderDirectory) {
+            gridContainer.innerHTML = `<div class="no-cards-msg">Could not locate 'cards/${relativePath}/' folder directory. Check folder setup on GitHub.</div>`;
+            return;
+        }
+
+        const apiResponse = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${actualFolderDirectory}`);
         if (!apiResponse.ok) {
-            gridContainer.innerHTML = `<div class="no-cards-msg">Could not locate 'cards/${relativePath.toLowerCase()}' folder directory. Check folder setup on GitHub.</div>`;
+            gridContainer.innerHTML = `<div class="no-cards-msg">Error reading directory files contents.</div>`;
             return;
         }
 
         const filesList = await apiResponse.json();
         const jsonFiles = filesList.filter(file => file.name.toLowerCase().endsWith('.json'));
+
         if (jsonFiles.length === 0) {
             gridContainer.innerHTML = `<div class="no-cards-msg">No items uploaded here yet.</div>`;
             return;
         }
 
         gridContainer.innerHTML = '';
-        let displayTag = relativePath.replace('/', ' / ').toUpperCase();
 
         for (const file of jsonFiles) {
             try {
@@ -525,73 +451,54 @@ async function loadCategoryCards(relativePath) {
                 const itemData = await fileContentResponse.json();
                 
                 loadedItemsStorage[itemData.id] = itemData;
-                activeRawItemsArray.push({id: itemData.id, title: itemData.title.toLowerCase(), htmlTag: displayTag, raw: itemData});
-            } catch (err) {}
+                
+                const cardHtml = `
+                    <div class="preview-card" id="${itemData.id}" onclick="openVaultModal('${itemData.id}')">
+                        <div class="card-img-wrap">
+                            <img src="${itemData.img}" alt="Product Image" onerror="this.src='https://placehold.co/400x300?text=Image+Not+Found'">
+                        </div>
+                        <div class="card-content">
+                            <div class="card-title">${itemData.title}</div>
+                        </div>
+                    </div>
+                `;
+                gridContainer.insertAdjacentHTML('beforeend', cardHtml);
+            } catch (err) {
+                console.error("Error payload structural loop mapping:", err);
+            }
         }
-        renderCustomFilteredGrid(activeRawItemsArray);
     } catch (error) {
-        gridContainer.innerHTML = `<div class="no-cards-msg">Network asset synchronization failure.</div>`;
+        console.error("GitHub transmission processing failure:", error);
+        gridContainer.innerHTML = `<div class="no-cards-msg">Failed to securely download assets index maps from GitHub.</div>`;
     }
-}
-
-function renderCustomFilteredGrid(itemsList) {
-    const gridContainer = document.getElementById('cardGrid');
-    gridContainer.innerHTML = '';
-    if(itemsList.length === 0) {
-        gridContainer.innerHTML = `<div class="no-cards-msg">No products matches criteria.</div>`;
-        return;
-    }
-    itemsList.forEach(pack => {
-        const cardHtml = `
-            <div class="preview-card" id="${pack.id}" onclick="openVaultModal('${pack.id}')">
-                <div class="card-img-wrap">
-                    <img src="${pack.raw.img}" alt="Product Image" onerror="this.src='https://placehold.co/400x300?text=Asset+Error'">
-                </div>
-                <div class="card-content">
-                    <div class="card-title">${pack.raw.title}</div>
-                    <div class="card-tag">${pack.htmlTag}</div>
-                </div>
-            </div>
-        `;
-        gridContainer.insertAdjacentHTML('beforeend', cardHtml);
-    });
-}
-
-function filterGridCards() {
-    const query = document.getElementById('searchFilterInput').value.trim().toLowerCase();
-    if(!query) {
-        renderCustomFilteredGrid(activeRawItemsArray);
-        return;
-    }
-    const filtered = activeRawItemsArray.filter(i => i.title.includes(query));
-    renderCustomFilteredGrid(filtered);
 }
 
 function switchCategory(categoryName, element) {
-    if(currentMainCategory === categoryName && categoryName !== 'ig brands') return;
+    if(currentMainCategory === categoryName && categoryName !== 'IG-Brands') return;
     currentMainCategory = categoryName;
+
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     element.classList.add('active');
-    document.getElementById('searchFilterInput').value = '';
 
     const subNavElement = document.getElementById('igSubNav');
-    if (categoryName.toLowerCase() === 'ig brands') {
+
+    if (categoryName.toLowerCase() === 'ig-brands') {
         subNavElement.style.display = 'flex';
-        loadCategoryCards(`ig brands/${currentSubCategory}`);
+        loadCategoryCards(`IG-Brands/${currentSubCategory}`);
     } else {
         subNavElement.style.display = 'none';
         loadCategoryCards(categoryName);
     }
 }
 
-// Fixed nested routing parameters to read perfectly
 function switchSubCategory(subCategoryName, element) {
     if(currentSubCategory === subCategoryName) return;
     currentSubCategory = subCategoryName;
+
     document.querySelectorAll('.sub-tab-btn').forEach(btn => btn.classList.remove('active'));
     element.classList.add('active');
-    document.getElementById('searchFilterInput').value = '';
-    loadCategoryCards(`ig brands/${subCategoryName}`);
+
+    loadCategoryCards(`IG-Brands/${subCategoryName}`);
 }
 
 function openVaultModal(cardId) {
@@ -600,22 +507,16 @@ function openVaultModal(cardId) {
 
     document.getElementById('vTitle').innerText = itemData.title;
     document.getElementById('vImg').src = itemData.img;
+    document.getElementById('vPriceUsd').innerText = `≈ $${itemData.price.toFixed(2)}`;
     
-    let processedLabelStr = "";
-    if(globalUserPreferredCurrency === "USD") processedLabelStr = `≈ $${itemData.price.toFixed(2)}`;
-    else if(globalUserPreferredCurrency === "CNY") processedLabelStr = `≈ ¥ ${(itemData.price * EXCHANGE_RATES.CNY).toFixed(2)}`;
-    else if(globalUserPreferredCurrency === "EUR") processedLabelStr = `≈ € ${(itemData.price * EXCHANGE_RATES.EUR).toFixed(2)}`;
-    else if(globalUserPreferredCurrency === "GBP") processedLabelStr = `≈ £ ${(itemData.price * EXCHANGE_RATES.GBP).toFixed(2)}`;
-    
-    document.getElementById('vPriceUsd').innerText = processedLabelStr;
-    
-    const usdVal = itemData.price.toFixed(2);
     const cnyVal = (itemData.price * EXCHANGE_RATES.CNY).toFixed(2);
     const eurVal = (itemData.price * EXCHANGE_RATES.EUR).toFixed(2);
     const gbpVal = (itemData.price * EXCHANGE_RATES.GBP).toFixed(2);
     
     document.getElementById('vPriceConversions').innerHTML = `
-        $ ${usdVal}<br>¥ ${cnyVal}<br>€ ${eurVal}<br>£ ${gbpVal}
+        ¥ ${cnyVal}<br>
+        € ${eurVal}<br>
+        £ ${gbpVal}
     `;
     
     const links = itemData.links;
@@ -625,21 +526,20 @@ function openVaultModal(cardId) {
         <a href="${links.litbuy}" target="_blank" class="vault-agent-btn v-litbuy">Open in Litbuy</a>
         <a href="${links.oopbuy}" target="_blank" class="vault-agent-btn v-oopbuy">Open in Oopbuy</a>
     `;
+
     document.getElementById('vaultModal').style.display = 'flex';
 }
 
-function closeVault(event, modalId) {
-    if (event.target === document.getElementById(modalId)) {
-        document.getElementById(modalId).style.display = 'none';
+function closeVault(event) {
+    if (event === null || event.target === document.getElementById('vaultModal')) {
+        document.getElementById('vaultModal').style.display = 'none';
     }
 }
 
 window.onload = () => {
-    const savedTheme = localStorage.getItem('user-theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    updateToggleVisualAssets(savedTheme);
-    loadCategoryCards("ig brands/hoodies");
+    loadCategoryCards("hoodies");
 };
 </script>
+
 </body>
 </html>
