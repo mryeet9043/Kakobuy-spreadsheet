@@ -49,22 +49,24 @@
             transition: background 0.3s ease, color 0.3s ease;
         }
         
-        /* --- Upper Header Actions Hub --- */
+        /* --- Upper Header Actions Hub (Centered Layout) --- */
         .header-container {
             max-width: 1200px;
             margin: 0 auto 30px auto;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
+            gap: 20px;
             position: relative;
         }
         .hub-heading {
             margin: 0;
             color: var(--text-bright);
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 900;
             letter-spacing: -1px;
             text-transform: uppercase;
+            text-align: center;
         }
         .utility-controls {
             display: flex;
@@ -92,6 +94,7 @@
             width: 20px;
             height: 20px;
             filter: invert(var(--invert-val));
+            transition: filter 0.3s ease;
         }
 
         /* --- Main Category Tab Layout --- */
@@ -130,7 +133,7 @@
             display: none;
             justify-content: center;
             gap: 12px;
-            margin-bottom: 45px;
+            margin-bottom: 30px;
             flex-wrap: wrap;
         }
         .sub-tab-btn {
@@ -153,11 +156,11 @@
             color: white;
         }
 
-        /* --- Search Bar Container --- */
+        /* --- Permanent Search Bar Container --- */
         .search-wrapper {
             max-width: 500px;
             margin: 0 auto 35px auto;
-            display: none;
+            display: block;
         }
         .search-input {
             width: 100%;
@@ -169,6 +172,7 @@
             font-size: 14px;
             box-sizing: border-box;
             outline: none;
+            text-align: center;
         }
 
         /* --- Showcase Layout Grid --- */
@@ -323,13 +327,13 @@
 
         /* --- Settings Layout Window Elements --- */
         .settings-row {
-            margin-bottom: 20px;
+            margin-bottom: 5px;
         }
         .settings-row label {
             display: block;
             font-weight: bold;
             color: var(--text-bright);
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             font-size: 14px;
         }
         .settings-select {
@@ -356,10 +360,10 @@
         <h1 class="hub-heading">xq0b's finds</h1>
         <div class="utility-controls">
             <button class="control-btn" onclick="toggleTheme()" title="Toggle Theme">
-                <img src="https://img.icons8.com/ios-filled/50/eclipse-anomalies.png" alt="Theme">
+                <img id="themeIcon" src="https://img.icons8.com/ios-filled/50/eclipse-anomalies.png" alt="Theme">
             </button>
             <button class="control-btn" onclick="openSettings()" title="Settings & QOL Options">
-                <img src="https://img.icons8.com/ios-filled/50/settings.png" alt="Settings">
+                <img id="settingsIcon" src="https://img.icons8.com/ios-filled/50/settings.png" alt="Settings">
             </button>
         </div>
     </div>
@@ -380,7 +384,7 @@
     </div>
 
     <div class="search-wrapper" id="searchWrapper">
-        <input type="text" class="search-input" id="searchFilterInput" placeholder="Type to filter folder results..." oninput="filterGridCards()">
+        <input type="text" class="search-input" id="searchFilterInput" placeholder="🔍 Search this folder..." oninput="filterGridCards()">
     </div>
     
     <div class="card-grid" id="cardGrid"></div>
@@ -423,13 +427,6 @@
                     <option value="GBP">GBP (£)</option>
                 </select>
             </div>
-            <div class="settings-row">
-                <label for="searchBarToggle">Folder Content Search Filter</label>
-                <select id="searchBarToggle" class="settings-select" onchange="toggleSearchBar()">
-                    <option value="hide">Hidden</option>
-                    <option value="show">Visible</option>
-                </select>
-            </div>
         </div>
     </div>
 
@@ -454,18 +451,6 @@ function toggleTheme() {
 
 function openSettings() {
     document.getElementById('settingsModal').style.display = 'flex';
-}
-
-function toggleSearchBar() {
-    const val = document.getElementById('searchBarToggle').value;
-    const wrapper = document.getElementById('searchWrapper');
-    if(val === 'show') {
-        wrapper.style.display = 'block';
-    } else {
-        wrapper.style.display = 'none';
-        document.getElementById('searchFilterInput').value = '';
-        filterGridCards();
-    }
 }
 
 function changePrimaryCurrency() {
@@ -593,7 +578,6 @@ function openVaultModal(cardId) {
     document.getElementById('vTitle').innerText = itemData.title;
     document.getElementById('vImg').src = itemData.img;
     
-    // Dynamic Top Badge Currency Processor Logic
     let processedLabelStr = "";
     if(globalUserPreferredCurrency === "USD") processedLabelStr = `≈ $${itemData.price.toFixed(2)}`;
     else if(globalUserPreferredCurrency === "CNY") processedLabelStr = `≈ ¥ ${(itemData.price * EXCHANGE_RATES.CNY).toFixed(2)}`;
