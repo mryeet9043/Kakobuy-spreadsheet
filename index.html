@@ -22,7 +22,7 @@
             --border-color: #2c3540;
             --nav-bg: #11141a;
             --sub-bg: #1f2833;
-            --invert-val: 0; /* Keeps white icons on dark background */
+            --invert-val: 0;
         }
 
         [data-theme="light"] {
@@ -37,7 +37,7 @@
             --border-color: #e1e0de;
             --nav-bg: #ffffff;
             --sub-bg: #e9e8e6;
-            --invert-val: 1; /* Inverts white icons to black on light background */
+            --invert-val: 1;
         }
         
         body {
@@ -93,7 +93,7 @@
         .control-btn img {
             width: 20px;
             height: 20px;
-            filter: invert(var(--invert-val)) !important;
+            filter: invert(var(--invert-val));
             transition: filter 0.3s ease;
         }
 
