@@ -22,7 +22,7 @@
             --border-color: #2c3540;
             --nav-bg: #11141a;
             --sub-bg: #1f2833;
-            --invert-val: 0; /* Keeps white icons on dark background */
+            --invert-val: 1; /* Inverts dark asset icons to crisp white on dark bg */
         }
 
         [data-theme="light"] {
@@ -37,7 +37,7 @@
             --border-color: #e1e0de;
             --nav-bg: #ffffff;
             --sub-bg: #e9e8e6;
-            --invert-val: 1; /* Inverts white icons to black on light background */
+            --invert-val: 0; /* Keeps asset icons dark on light bg */
         }
         
         body {
@@ -91,8 +91,8 @@
             transform: scale(1.05);
         }
         .control-btn img {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             filter: invert(var(--invert-val)) !important;
             transition: filter 0.3s ease;
         }
@@ -360,7 +360,7 @@
         <h1 class="hub-heading">xq0b's finds</h1>
         <div class="utility-controls">
             <button class="control-btn" onclick="toggleTheme()" title="Toggle Theme">
-                <img id="themeIcon" src="https://img.icons8.com/ios-filled/50/eclipse-anomalies.png" alt="Theme">
+                <img id="themeIcon" src="lightmodeicon.png" alt="Theme">
             </button>
             <button class="control-btn" onclick="openSettings()" title="Settings & QOL Options">
                 <img id="settingsIcon" src="https://img.icons8.com/ios-filled/50/settings.png" alt="Settings">
@@ -442,11 +442,21 @@ let currentMainCategory = "IG-Brands";
 let currentSubCategory = "hoodies";
 let globalUserPreferredCurrency = "USD";
 
+function updateToggleIcon(theme) {
+    const iconImg = document.getElementById('themeIcon');
+    if (theme === 'light') {
+        iconImg.src = 'darkmodeicon.png';
+    } else {
+        iconImg.src = 'lightmodeicon.png';
+    }
+}
+
 function toggleTheme() {
     const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
     const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', nextTheme);
     localStorage.setItem('user-theme', nextTheme);
+    updateToggleIcon(nextTheme);
 }
 
 function openSettings() {
@@ -614,6 +624,7 @@ function closeVault(event, modalId) {
 window.onload = () => {
     const savedTheme = localStorage.getItem('user-theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
+    updateToggleIcon(savedTheme);
     loadCategoryCards("IG-Brands/hoodies");
 };
 </script>
