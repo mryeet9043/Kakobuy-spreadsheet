@@ -467,29 +467,18 @@ function changePrimaryCurrency() {
     globalUserPreferredCurrency = document.getElementById('currencySelect').value;
 }
 
-// Robust layout handler that hits /cards/ directly on your root repository hierarchy
-async function fetchWithCaseFallback(path) {
-    const directUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${path}`;
-    let response = await fetch(directUrl);
-    
-    if (response.ok) return response;
-
-    // Capitalizes first letter of words if your folders use Title Case
-    let fallbackPath = path;
-    if (path.includes('/')) {
-        let parts = path.split('/');
-        fallbackPath = parts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('/');
-    } else {
-        fallbackPath = path.charAt(0).toUpperCase() + path.slice(1);
+async function findActualGitHubPath(targetPath) {
+    const parts = targetPath.split('/');
+    let currentPath = 'cards';
+    for (const part of parts) {
+        const resp = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/currentPath`.replace('currentPath', currentPath));
+        if (!resp.ok) return null;
+        const items = await resp.json();
+        const matchedItem = items.find(i => i.name.toLowerCase() === part.toLowerCase());
+        if (!matchedItem) return null;
+        currentPath = currentPath + '/' + matchedItem.name;
     }
-    
-    const fallbackUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${fallbackPath}`;
-    response = await fetch(fallbackUrl);
-    if (response.ok) return response;
-    
-    // Complete lower case option checklist fallback
-    const lowerUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${path.toLowerCase()}`;
-    return await fetch(lowerUrl);
+    return currentPath;
 }
 
 async function loadCategoryCards(relativePath) {
@@ -499,12 +488,14 @@ async function loadCategoryCards(relativePath) {
     activeRawItemsArray = [];
 
     try {
-        const apiResponse = await fetchWithCaseFallback(relativePath);
-        
-        if (!apiResponse.ok) {
-            gridContainer.innerHTML = `<div class="no-cards-msg">No items uploaded here yet.</div>`;
+        const actualFolderDirectory = await findActualGitHubPath(relativePath);
+        if (!actualFolderDirectory) {
+            gridContainer.innerHTML = `<div class="no-cards-msg">Folder directory map layout error.</div>`;
             return;
         }
+
+        const apiResponse = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${actualFolderDirectory}`);
+        if (!apiResponse.ok) return;
 
         const filesList = await apiResponse.json();
         const jsonFiles = filesList.filter(file => file.name.toLowerCase().endsWith('.json'));
