@@ -90,10 +90,10 @@
             border-color: var(--tab-inactive);
             transform: scale(1.05);
         }
-        .control-btn img {
+        .control-btn img, .control-btn svg {
             width: 22px;
             height: 22px;
-            filter: invert(var(--invert-val)) !important;
+            filter: invert(var(--invert-val));
             transition: filter 0.3s ease;
         }
 
@@ -363,7 +363,10 @@
                 <img id="themeIcon" src="lightmodeicon.png" alt="Theme">
             </button>
             <button class="control-btn" onclick="openSettings()" title="Settings & QOL Options">
-                <img id="settingsIcon" src="lightmodeicon.png" alt="Settings" style="transform: rotate(45deg);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
             </button>
         </div>
     </div>
@@ -467,28 +470,10 @@ function changePrimaryCurrency() {
     globalUserPreferredCurrency = document.getElementById('currencySelect').value;
 }
 
-// Case logic queries with immediate path alternatives to catch both variations
-async function fetchWithCaseFallback(path) {
-    const directUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${path}`;
-    let response = await fetch(directUrl);
-    if (response.ok) return response;
-
-    // Checks Title Case variants (e.g. accessories -> Accessories)
-    let fallbackPath = path;
-    if (path.includes('/')) {
-        let parts = path.split('/');
-        fallbackPath = parts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('/');
-    } else {
-        fallbackPath = path.charAt(0).toUpperCase() + path.slice(1);
-    }
-    
-    const fallbackUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${fallbackPath}`;
-    response = await fetch(fallbackUrl);
-    if (response.ok) return response;
-    
-    // Checks lowercase variants
-    const lowerUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${path.toLowerCase()}`;
-    return await fetch(lowerUrl);
+// Queries GitHub repository using case rules matching your layout snapshot
+async function fetchCategoryContents(path) {
+    const targetUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${path}`;
+    return await fetch(targetUrl);
 }
 
 async function loadCategoryCards(relativePath) {
@@ -498,7 +483,7 @@ async function loadCategoryCards(relativePath) {
     activeRawItemsArray = [];
 
     try {
-        const apiResponse = await fetchWithCaseFallback(relativePath);
+        const apiResponse = await fetchCategoryContents(relativePath);
         
         if (!apiResponse.ok) {
             gridContainer.innerHTML = `<div class="no-cards-msg">No items uploaded here yet.</div>`;
@@ -553,7 +538,6 @@ function renderCustomFilteredGrid(itemsList) {
     });
 }
 
-// Real-time grid rendering query
 function filterGridCards() {
     const query = document.getElementById('searchFilterInput').value.trim().toLowerCase();
     if(!query) {
@@ -634,6 +618,8 @@ window.onload = () => {
     const savedTheme = localStorage.getItem('user-theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
     updateToggleIcon(savedTheme);
+    
+    // Ensure you have subfolders inside /cards/IG-Brands/ matching these exact names
     loadCategoryCards("IG-Brands/hoodies");
 };
 </script>
