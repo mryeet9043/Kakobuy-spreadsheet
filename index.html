@@ -22,6 +22,7 @@
             --border-color: #2c3540;
             --nav-bg: #11141a;
             --sub-bg: #1f2833;
+            --icon-invert: invert(1); /* Inverts dark moon icon to display beautifully on dark backgrounds */
         }
 
         [data-theme="light"] {
@@ -36,6 +37,7 @@
             --border-color: #e1e0de;
             --nav-bg: #ffffff;
             --sub-bg: #e9e8e6;
+            --icon-invert: invert(0); /* Leaves sun icon standard color on light backgrounds */
         }
         
         body {
@@ -90,6 +92,32 @@
         .control-btn:hover {
             border-color: var(--tab-inactive);
             transform: scale(1.02);
+        }
+
+        /* --- Image-driven Theme Toggle Adjustments --- */
+        .theme-toggle-img-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--nav-bg);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .theme-toggle-img-btn:hover {
+            border-color: var(--tab-inactive);
+            transform: scale(1.05);
+        }
+        .theme-toggle-img-btn img {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+            filter: var(--icon-invert);
+            transition: filter 0.3s ease;
         }
 
         /* --- Main Category Tab Layout --- */
@@ -354,7 +382,9 @@
     <div class="header-container">
         <h1 class="hub-heading">xq0b's finds</h1>
         <div class="utility-controls">
-            <button class="control-btn" id="themeTogglerBtn" onclick="toggleTheme()">Light Mode</button>
+            <button class="theme-toggle-img-btn" id="themeTogglerBtn" onclick="toggleTheme()" title="Switch Light/Dark View Mode">
+                <img id="themeIconImage" src="lightmodeicon.png" alt="Theme Icon">
+            </button>
             
             <button class="control-btn" onclick="openSettings()" title="Settings & QOL Options" style="padding: 10px; border-radius: 50%; width: 36px; height: 36px;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
@@ -366,18 +396,18 @@
     </div>
     
     <div class="category-nav">
-        <button class="tab-btn active" id="igBrandsTab" onclick="switchCategory('IG-Brands', this)">IG Brands</button>
+        <button class="tab-btn active" id="igBrandsTab" onclick="switchCategory('ig-brands', this)">IG Brands</button>
         <button class="tab-btn" onclick="switchCategory('accessories', this)">Accessories</button>
         <button class="tab-btn" onclick="switchCategory('hoodies', this)">Hoodies</button>
         <button class="tab-btn" onclick="switchCategory('jeans', this)">Jeans</button>
         <button class="tab-btn" onclick="switchCategory('shoes', this)">Shoes</button>
-        <button class="tab-btn" onclick="switchCategory('T-shirts', this)">T-Shirts</button>
+        <button class="tab-btn" onclick="switchCategory('t-shirts', this)">T-Shirts</button>
     </div>
 
     <div class="sub-nav" id="igSubNav" style="display: flex;">
         <button class="sub-tab-btn active" onclick="switchSubCategory('hoodies', this)">Hoodies</button>
         <button class="sub-tab-btn" onclick="switchSubCategory('jeans', this)">Jeans</button>
-        <button class="sub-tab-btn" onclick="switchSubCategory('T-shirts', this)">T-Shirts</button>
+        <button class="sub-tab-btn" onclick="switchSubCategory('t-shirts', this)">T-Shirts</button>
     </div>
 
     <div class="search-wrapper" id="searchWrapper">
@@ -435,14 +465,20 @@ const EXCHANGE_RATES = { CNY: 7.24, EUR: 0.92, GBP: 0.78 };
 const GITHUB_USER = "mryeet9043";
 const GITHUB_REPO = "Kakobuy-spreadsheet";
 
-let currentMainCategory = "IG-Brands";
+let currentMainCategory = "ig-brands";
 let currentSubCategory = "hoodies";
 let globalUserPreferredCurrency = "USD";
 
-function updateToggleText(theme) {
-    const btn = document.getElementById('themeTogglerBtn');
-    if (!btn) return;
-    btn.innerText = theme === 'light' ? 'Dark Mode' : 'Light Mode';
+// Updates your toggle container to swap seamlessly between your clean uploaded asset images
+function updateToggleVisualAssets(theme) {
+    const iconImg = document.getElementById('themeIconImage');
+    if (!iconImg) return;
+    
+    if (theme === 'light') {
+        iconImg.src = 'darkmodeicon.png';
+    } else {
+        iconImg.src = 'lightmodeicon.png';
+    }
 }
 
 function toggleTheme() {
@@ -450,7 +486,7 @@ function toggleTheme() {
     const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', nextTheme);
     localStorage.setItem('user-theme', nextTheme);
-    updateToggleText(nextTheme);
+    updateToggleVisualAssets(nextTheme);
 }
 
 function openSettings() {
@@ -461,30 +497,21 @@ function changePrimaryCurrency() {
     globalUserPreferredCurrency = document.getElementById('currencySelect').value;
 }
 
-// Bypasses path looping and checks exact target location + alternate lowercased fallback patterns directly
-async function fetchDirectoryContents(relativePath) {
-    const primaryUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${relativePath}`;
-    let resp = await fetch(primaryUrl);
-    
-    if (!resp.ok) {
-        // Fallback option just in case GitHub directory structural matching layout is strictly lowercase
-        const secondaryUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${relativePath.toLowerCase()}`;
-        resp = await fetch(secondaryUrl);
-    }
-    return resp;
-}
-
 async function loadCategoryCards(relativePath) {
     const gridContainer = document.getElementById('cardGrid');
     gridContainer.innerHTML = `<div class="no-cards-msg" id="loadingMsg">Loading finds...</div>`;
     loadedItemsStorage = {};
     activeRawItemsArray = [];
 
+    // Formats and cleans paths to replace spaces with hyphens, ensuring perfect path matching
+    const cleanedPath = relativePath.toLowerCase().replace(/\s+/g, '-');
+
     try {
-        const apiResponse = await fetchDirectoryContents(relativePath);
+        const primaryUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${cleanedPath}`;
+        const apiResponse = await fetch(primaryUrl);
         
         if (!apiResponse.ok) {
-            gridContainer.innerHTML = `<div class="no-cards-msg">Could not locate 'cards/${relativePath}' folder directory. Check folder setup on GitHub.</div>`;
+            gridContainer.innerHTML = `<div class="no-cards-msg">Could not locate 'cards/${cleanedPath}' directory. Please confirm file paths match perfectly.</div>`;
             return;
         }
 
@@ -496,7 +523,7 @@ async function loadCategoryCards(relativePath) {
         }
 
         gridContainer.innerHTML = '';
-        let displayTag = relativePath.replace('/', ' / ');
+        let displayTag = relativePath.replace('/', ' / ').toUpperCase();
 
         for (const file of jsonFiles) {
             try {
@@ -547,7 +574,7 @@ function filterGridCards() {
 }
 
 function switchCategory(categoryName, element) {
-    if(currentMainCategory === categoryName && categoryName !== 'IG-Brands') return;
+    if(currentMainCategory === categoryName && categoryName !== 'ig-brands') return;
     currentMainCategory = categoryName;
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     element.classList.add('active');
@@ -556,7 +583,7 @@ function switchCategory(categoryName, element) {
     const subNavElement = document.getElementById('igSubNav');
     if (categoryName.toLowerCase() === 'ig-brands') {
         subNavElement.style.display = 'flex';
-        loadCategoryCards(`IG-Brands/${currentSubCategory}`);
+        loadCategoryCards(`ig-brands/${currentSubCategory}`);
     } else {
         subNavElement.style.display = 'none';
         loadCategoryCards(categoryName);
@@ -569,7 +596,7 @@ function switchSubCategory(subCategoryName, element) {
     document.querySelectorAll('.sub-tab-btn').forEach(btn => btn.classList.remove('active'));
     element.classList.add('active');
     document.getElementById('searchFilterInput').value = '';
-    loadCategoryCards(`IG-Brands/${subCategoryName}`);
+    loadCategoryCards(`ig-brands/${subCategoryName}`);
 }
 
 function openVaultModal(cardId) {
@@ -615,8 +642,8 @@ function closeVault(event, modalId) {
 window.onload = () => {
     const savedTheme = localStorage.getItem('user-theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
-    updateToggleText(savedTheme);
-    loadCategoryCards("IG-Brands/hoodies");
+    updateToggleVisualAssets(savedTheme);
+    loadCategoryCards("ig-brands/hoodies");
 };
 </script>
 </body>
