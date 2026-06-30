@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>xq0b's finds</title>
     <style>
-        /* --- Boot Loader Styles --- */
+        /* --- High-Speed Boot Loader --- */
         #boot-loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; color: #00ff41; font-family: 'Courier New', monospace;
             padding: 20px; z-index: 9999; display: flex; flex-direction: column;
-            overflow: hidden; transition: opacity 0.8s ease;
+            overflow: hidden; transition: opacity 0.4s ease;
         }
-        #boot-log { font-size: 14px; line-height: 1.5; white-space: pre; }
+        #boot-log { font-size: 12px; line-height: 1.2; white-space: pre; }
         .fade-out { opacity: 0; pointer-events: none; }
 
         /* --- Main UI Styles --- */
@@ -127,7 +127,6 @@
 </head>
 <body>
 
-    <!-- Boot Loader -->
     <div id="boot-loader">
         <div id="boot-log"></div>
     </div>
@@ -150,91 +149,59 @@
         <button class="sub-tab-btn" onclick="switchSubCategory('T-shirts', this)">T-Shirts</button>
     </div>
     
-    <div class="card-grid" id="cardGrid">
-        <div class="no-cards-msg" id="loadingMsg">Loading configuration...</div>
-    </div>
+    <div class="card-grid" id="cardGrid"></div>
 
     <div class="modal-overlay" id="vaultModal" onclick="closeVault(event)">
         <div class="vault-container" onclick="event.stopPropagation()">
-            <h1 class="vault-title" id="vTitle" style="color: white; font-size: 20px;">Product</h1>
-            <div class="vault-main-img"><img id="vImg" src="" style="width:100%; border-radius: 12px;"></div>
+            <h1 id="vTitle" style="color: white; font-size: 20px;">Product</h1>
+            <img id="vImg" src="" style="width:100%; border-radius: 12px; margin-bottom: 15px;">
             <div id="vAgentStack"></div>
             <button onclick="closeVault(null)" style="margin-top:20px; width:100%; padding:10px; cursor:pointer;">Close</button>
         </div>
     </div>
 
     <script>
-        // Boot Sequence Logic
-        window.addEventListener('DOMContentLoaded', () => {
-            const logEl = document.getElementById('boot-log');
-            const logs = [
-                "[    0.000000] Linux version 6.6.9-arch1-1",
-                "[    0.001234] Initializing cgroup subsys cpuset",
-                "[    0.001256] Loading modules...",
-                "[    0.150000] xq0b-boot-sequence: starting...",
-                "[    0.280000] Mounting filesystems: /dev/sda1 -> /",
-                "[    0.420000] Loading core assets: [OK]",
-                "[    0.600000] Configuring network: xq0b_hub: 192.168.1.1",
-                "[    0.850000] Starting GUI components...",
-                "[    1.200000] Initialization complete. Welcome, user."
-            ];
-            let i = 0;
-            function printLogs() {
-                if (i < logs.length) {
-                    logEl.innerText += logs[i] + "\n";
-                    i++;
-                    setTimeout(printLogs, 250);
-                } else {
-                    setTimeout(() => { document.getElementById('boot-loader').classList.add('fade-out'); }, 800);
-                }
+        // High-Speed Boot Sequence
+        const logEl = document.getElementById('boot-log');
+        const logs = [
+            "INITIALIZING CORE SYSTEM...", "SCANNING REPOSITORIES...", "CHECKING NETWORK PACKETS...",
+            "AUTHENTICATING API ENDPOINTS...", "ESTABLISHING SECURE CONNECTION...", "LOADING ASSET MAP...",
+            "INITIALIZING MEMORY BUFFERS...", "ALLOCATING VIRTUAL MEMORY...", "COMPILING SOURCE BLOCKS...",
+            "UPDATING LOCAL DATA CACHE...", "SYNCHRONIZING GITHUB DATA...", "SYSTEM READY. STARTING GUI...",
+            "ENCRYPTING DATA STREAMS...", "ACCESSING NODE_MODULES...", "RENDER_PIPELINE: ENABLED.",
+            "BOOT_STATUS: SUCCESSFUL", "WELCOME_MSG: XQ0B_HUB_READY"
+        ];
+        let idx = 0;
+        const interval = setInterval(() => {
+            logEl.innerText += logs[idx] + "\n";
+            idx++;
+            if (idx >= logs.length) {
+                clearInterval(interval);
+                setTimeout(() => document.getElementById('boot-loader').classList.add('fade-out'), 200);
             }
-            printLogs();
-        });
+        }, 60);
 
         // App Logic
         let loadedItemsStorage = {};
         const GITHUB_USER = "mryeet9043";
         const GITHUB_REPO = "Kakobuy-spreadsheet";
-        let currentMainCategory = "IG-Brands";
         let currentSubCategory = "hoodies";
 
-        async function findActualGitHubPath(targetPath) {
-            const parts = targetPath.split('/');
-            let currentPath = 'cards';
-            for (const part of parts) {
-                const resp = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${currentPath}`);
-                if (!resp.ok) return null;
-                const items = await resp.json();
-                const matchedItem = items.find(i => i.name.toLowerCase() === part.toLowerCase());
-                if (!matchedItem) return null;
-                currentPath = currentPath + '/' + matchedItem.name;
-            }
-            return currentPath;
-        }
-
-        async function loadCategoryCards(relativePath) {
-            const gridContainer = document.getElementById('cardGrid');
-            const actualFolderDirectory = await findActualGitHubPath(relativePath);
-            if (!actualFolderDirectory) return;
-            const apiResponse = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${actualFolderDirectory}`);
-            const filesList = await apiResponse.json();
-            gridContainer.innerHTML = '';
-            for (const file of filesList.filter(f => f.name.endsWith('.json'))) {
-                const itemData = await (await fetch(file.download_url)).json();
-                loadedItemsStorage[itemData.id] = itemData;
-                gridContainer.innerHTML += `
-                    <div class="preview-card" onclick="openVaultModal('${itemData.id}')">
-                        <div class="card-img-wrap"><img src="${itemData.img}"></div>
-                        <div class="card-content">
-                            <div class="card-title">${itemData.title}</div>
-                            <div class="card-tag">${relativePath}</div>
-                        </div>
-                    </div>`;
-            }
+        async function loadCategoryCards(path) {
+            const grid = document.getElementById('cardGrid');
+            try {
+                const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/cards/${path}`);
+                const files = await res.json();
+                grid.innerHTML = '';
+                for (const f of files.filter(file => file.name.endsWith('.json'))) {
+                    const data = await (await fetch(f.download_url)).json();
+                    loadedItemsStorage[data.id] = data;
+                    grid.innerHTML += `<div class="preview-card" onclick="openVaultModal('${data.id}')"><div class="card-img-wrap"><img src="${data.img}"></div><div class="card-content"><div class="card-title">${data.title}</div><div class="card-tag">${path}</div></div></div>`;
+                }
+            } catch (e) { grid.innerHTML = 'Connection Error.'; }
         }
 
         function switchCategory(c, e) {
-            currentMainCategory = c;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             e.classList.add('active');
             document.getElementById('igSubNav').style.display = (c === 'IG-Brands') ? 'flex' : 'none';
@@ -252,11 +219,7 @@
             const item = loadedItemsStorage[id];
             document.getElementById('vTitle').innerText = item.title;
             document.getElementById('vImg').src = item.img;
-            document.getElementById('vAgentStack').innerHTML = `
-                <a href="${item.links.kakobuy}" class="vault-agent-btn v-kakobuy">Kakobuy</a>
-                <a href="${item.links.mulebuy}" class="vault-agent-btn v-mulebuy">Mulebuy</a>
-                <a href="${item.links.litbuy}" class="vault-agent-btn v-litbuy">Litbuy</a>
-                <a href="${item.links.oopbuy}" class="vault-agent-btn v-oopbuy">Oopbuy</a>`;
+            document.getElementById('vAgentStack').innerHTML = `<a href="${item.links.kakobuy}" class="vault-agent-btn v-kakobuy">Kakobuy</a><a href="${item.links.mulebuy}" class="vault-agent-btn v-mulebuy">Mulebuy</a><a href="${item.links.litbuy}" class="vault-agent-btn v-litbuy">Litbuy</a><a href="${item.links.oopbuy}" class="vault-agent-btn v-oopbuy">Oopbuy</a>`;
             document.getElementById('vaultModal').style.display = 'flex';
         }
 
