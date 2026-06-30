@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>xq0b's finds</title>
+    <title>xq0b's finds | System Boot</title>
     <style>
-        /* --- High-Speed Boot Loader --- */
+        /* --- Extended Boot Loader --- */
         #boot-loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; color: #00ff41; font-family: 'Courier New', monospace;
-            padding: 20px; z-index: 9999; display: flex; flex-direction: column;
-            overflow: hidden; transition: opacity 0.4s ease;
+            padding: 25px; z-index: 9999; display: flex; flex-direction: column;
+            overflow-y: auto; transition: opacity 0.5s ease;
         }
-        #boot-log { font-size: 12px; line-height: 1.2; white-space: pre; }
+        #boot-log { font-size: 13px; line-height: 1.4; white-space: pre-wrap; }
         .fade-out { opacity: 0; pointer-events: none; }
 
         /* --- Main UI Styles --- */
@@ -32,93 +32,30 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: radial-gradient(circle at 50% 0%, #1a1f2e 0%, #06080a 70%);
             color: var(--text-main);
-            margin: 0;
-            padding: 60px 20px;
-            min-height: 100vh;
+            margin: 0; padding: 60px 20px; min-height: 100vh;
         }
         
-        .hub-heading {
-            text-align: center;
-            margin-bottom: 40px;
-            color: var(--text-bright);
-            font-size: 38px;
-            font-weight: 800;
-            letter-spacing: -1px;
-            text-transform: uppercase;
-        }
-        .hub-heading::after {
-            content: '';
-            display: block;
-            width: 40px;
-            height: 3px;
-            background: var(--accent-glow);
-            margin: 15px auto 0;
-            border-radius: 2px;
-        }
+        .hub-heading { text-align: center; margin-bottom: 40px; color: var(--text-bright); font-size: 38px; font-weight: 800; text-transform: uppercase; }
+        .hub-heading::after { content: ''; display: block; width: 40px; height: 3px; background: var(--accent-glow); margin: 15px auto 0; border-radius: 2px; }
 
-        .category-nav, .sub-nav {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-        .tab-btn, .sub-tab-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text-main);
-            padding: 10px 22px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+        .category-nav, .sub-nav { display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; flex-wrap: wrap; }
+        .tab-btn, .sub-tab-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-main); padding: 10px 22px; border-radius: 20px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
         .tab-btn:hover, .sub-tab-btn:hover { background: rgba(255, 255, 255, 0.08); color: var(--text-bright); }
         .tab-btn.active { background: var(--text-bright); color: #000; }
         .sub-tab-btn.active { background: var(--oopbuy-color); color: white; border-color: transparent; }
 
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 25px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .preview-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        .preview-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(69, 243, 255, 0.3);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
+        .preview-card { background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; overflow: hidden; cursor: pointer; transition: 0.3s; }
+        .preview-card:hover { transform: translateY(-8px); border-color: var(--accent-glow); }
         .card-img-wrap { width: 100%; height: 220px; background: #0b0c10; }
         .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
         .card-content { padding: 18px; }
         .card-title { font-weight: 600; color: var(--text-bright); margin-bottom: 8px; }
-        .card-tag { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-glow); }
+        .card-tag { font-size: 10px; color: var(--accent-glow); text-transform: uppercase; }
 
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
-            display: none; justify-content: center; align-items: center; z-index: 1000;
-        }
-        .vault-container {
-            background: #151a22; border: 1px solid #2c3540;
-            width: 500px; padding: 30px; border-radius: 24px;
-        }
-        .vault-agent-btn {
-            display: block; text-align: center; padding: 12px; margin-top: 10px;
-            color: white; font-weight: bold; border-radius: 10px; text-decoration: none;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .vault-container { background: #151a22; border: 1px solid #2c3540; width: 500px; padding: 30px; border-radius: 24px; }
+        .vault-agent-btn { display: block; text-align: center; padding: 12px; margin-top: 10px; color: white; font-weight: bold; border-radius: 10px; text-decoration: none; }
         .v-kakobuy { background: var(--kakobuy-color); }
         .v-mulebuy { background: var(--mulebuy-color); }
         .v-litbuy { background: var(--litbuy-color); }
@@ -134,7 +71,7 @@
     <h1 class="hub-heading">xq0b's finds</h1>
     
     <div class="category-nav">
-        <button class="tab-btn active" id="igBrandsTab" onclick="switchCategory('IG-Brands', this)">IG Brands</button>
+        <button class="tab-btn active" onclick="switchCategory('IG-Brands', this)">IG Brands</button>
         <button class="tab-btn" onclick="switchCategory('accessories', this)">Accessories</button>
         <button class="tab-btn" onclick="switchCategory('hoodies', this)">Hoodies</button>
         <button class="tab-btn" onclick="switchCategory('jeans', this)">Jeans</button>
@@ -161,15 +98,17 @@
     </div>
 
     <script>
-        // High-Speed Boot Sequence
         const logEl = document.getElementById('boot-log');
         const logs = [
-            "INITIALIZING CORE SYSTEM...", "SCANNING REPOSITORIES...", "CHECKING NETWORK PACKETS...",
-            "AUTHENTICATING API ENDPOINTS...", "ESTABLISHING SECURE CONNECTION...", "LOADING ASSET MAP...",
-            "INITIALIZING MEMORY BUFFERS...", "ALLOCATING VIRTUAL MEMORY...", "COMPILING SOURCE BLOCKS...",
-            "UPDATING LOCAL DATA CACHE...", "SYNCHRONIZING GITHUB DATA...", "SYSTEM READY. STARTING GUI...",
-            "ENCRYPTING DATA STREAMS...", "ACCESSING NODE_MODULES...", "RENDER_PIPELINE: ENABLED.",
-            "BOOT_STATUS: SUCCESSFUL", "WELCOME_MSG: XQ0B_HUB_READY"
+            "SCANNING_SYSTEM_RESOURCES...", "CHECKING_I/O_PORTS...", "LOADING_KERNEL_MAPS...",
+            "INITIALIZING_VIRTUAL_DISPLAY_DRIVERS...", "MOUNTING_REMOTE_FS...", "FETCHING_DEPENDENCIES...",
+            "VERIFYING_API_INTEGRITY...", "CONNECTING_TO_GITHUB_API...", "DOWNLOADING_ASSET_CACHE...",
+            "DECRYPTING_SECURE_STORAGE...", "PARSING_USER_CONFIGURATION...", "ENABLING_WEBGL_ACCELERATION...",
+            "NETWORK_LATENCY: 12ms", "BUFFER_OVERFLOW_CHECK: PASSED", "MEMORY_USAGE: 402MB/8192MB",
+            "DISK_IO_THROUGHPUT: 450MB/s", "USER_ID: XQ0B_GUEST", "AUTHENTICATION_TOKEN: VALID",
+            "INITIALIZING_GUI_ENGINE...", "RENDERING_UI_NODES...", "LOADING_CATEGORY_BUFFERS...",
+            "SYSTEM_READY_FOR_DEPLOYMENT...", "BOOT_SEQUENCE_COMPLETE...", "STARTUP_SUCCESS: TRUE",
+            "...", "...", "...", "...", "...", "...", "...", "...", "...", "...", "...", "...",
         ];
         let idx = 0;
         const interval = setInterval(() => {
@@ -177,11 +116,10 @@
             idx++;
             if (idx >= logs.length) {
                 clearInterval(interval);
-                setTimeout(() => document.getElementById('boot-loader').classList.add('fade-out'), 200);
+                setTimeout(() => document.getElementById('boot-loader').classList.add('fade-out'), 300);
             }
-        }, 60);
+        }, 40);
 
-        // App Logic
         let loadedItemsStorage = {};
         const GITHUB_USER = "mryeet9043";
         const GITHUB_REPO = "Kakobuy-spreadsheet";
@@ -198,14 +136,18 @@
                     loadedItemsStorage[data.id] = data;
                     grid.innerHTML += `<div class="preview-card" onclick="openVaultModal('${data.id}')"><div class="card-img-wrap"><img src="${data.img}"></div><div class="card-content"><div class="card-title">${data.title}</div><div class="card-tag">${path}</div></div></div>`;
                 }
-            } catch (e) { grid.innerHTML = 'Connection Error.'; }
+            } catch (e) { grid.innerHTML = 'Data could not be fetched.'; }
         }
 
         function switchCategory(c, e) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             e.classList.add('active');
             document.getElementById('igSubNav').style.display = (c === 'IG-Brands') ? 'flex' : 'none';
-            loadCategoryCards(c === 'IG-Brands' ? `IG-Brands/${currentSubCategory}` : c);
+            if (c === 'IG-Brands') {
+                loadCategoryCards(`IG-Brands/${currentSubCategory}`);
+            } else {
+                loadCategoryCards(c);
+            }
         }
 
         function switchSubCategory(s, e) {
