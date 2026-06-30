@@ -71,7 +71,7 @@
     <h1 class="hub-heading">xq0b's finds</h1>
     
     <div class="category-nav">
-        <button class="tab-btn active" onclick="switchCategory('IG-Brands', this)">IG Brands</button>
+        <button class="tab-btn active" onclick="switchCategory('ig-brands', this)">IG Brands</button>
         <button class="tab-btn" onclick="switchCategory('accessories', this)">Accessories</button>
         <button class="tab-btn" onclick="switchCategory('hoodies', this)">Hoodies</button>
         <button class="tab-btn" onclick="switchCategory('jeans', this)">Jeans</button>
@@ -142,9 +142,9 @@
         function switchCategory(c, e) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             e.classList.add('active');
-            document.getElementById('igSubNav').style.display = (c === 'IG-Brands') ? 'flex' : 'none';
-            if (c === 'IG-Brands') {
-                loadCategoryCards(`IG-Brands/${currentSubCategory}`);
+            document.getElementById('igSubNav').style.display = (c === 'ig-brands') ? 'flex' : 'none';
+            if (c === 'ig-brands') {
+                loadCategoryCards(`ig-brands/${currentSubCategory}`);
             } else {
                 loadCategoryCards(c);
             }
@@ -154,7 +154,7 @@
             currentSubCategory = s;
             document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
             e.classList.add('active');
-            loadCategoryCards(`IG-Brands/${s}`);
+            loadCategoryCards(`ig-brands/${s}`);
         }
 
         function openVaultModal(id) {
@@ -167,7 +167,7 @@
 
         function closeVault(e) { if (!e || e.target === document.getElementById('vaultModal')) document.getElementById('vaultModal').style.display = 'none'; }
         
-        window.onload = () => loadCategoryCards("IG-Brands/hoodies");
+        window.onload = () => loadCategoryCards("ig-brands/hoodies");
     </script>
 </body>
 </html>
