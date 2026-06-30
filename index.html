@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>xq0b's finds</title>
     <style>
+        /* --- Boot Loader Styles --- */
+        #boot-loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; color: #00ff41; font-family: 'Courier New', monospace;
+            padding: 20px; z-index: 9999; display: flex; flex-direction: column;
+            overflow: hidden; transition: opacity 0.8s ease;
+        }
+        #boot-log { font-size: 14px; line-height: 1.5; white-space: pre; }
+        .fade-out { opacity: 0; pointer-events: none; }
+
+        /* --- Main UI Styles --- */
         :root {
             --mulebuy-color: #8c7ae6;
             --kakobuy-color: #ff6b6b;
@@ -26,7 +37,6 @@
             min-height: 100vh;
         }
         
-        /* Heading */
         .hub-heading {
             text-align: center;
             margin-bottom: 40px;
@@ -46,7 +56,6 @@
             border-radius: 2px;
         }
 
-        /* Tabs */
         .category-nav, .sub-nav {
             display: flex;
             justify-content: center;
@@ -69,7 +78,6 @@
         .tab-btn.active { background: var(--text-bright); color: #000; }
         .sub-tab-btn.active { background: var(--oopbuy-color); color: white; border-color: transparent; }
 
-        /* Grid */
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -98,7 +106,6 @@
         .card-title { font-weight: 600; color: var(--text-bright); margin-bottom: 8px; }
         .card-tag { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-glow); }
 
-        /* Vault */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
@@ -119,6 +126,11 @@
     </style>
 </head>
 <body>
+
+    <!-- Boot Loader -->
+    <div id="boot-loader">
+        <div id="boot-log"></div>
+    </div>
 
     <h1 class="hub-heading">xq0b's finds</h1>
     
@@ -152,8 +164,35 @@
     </div>
 
     <script>
+        // Boot Sequence Logic
+        window.addEventListener('DOMContentLoaded', () => {
+            const logEl = document.getElementById('boot-log');
+            const logs = [
+                "[    0.000000] Linux version 6.6.9-arch1-1",
+                "[    0.001234] Initializing cgroup subsys cpuset",
+                "[    0.001256] Loading modules...",
+                "[    0.150000] xq0b-boot-sequence: starting...",
+                "[    0.280000] Mounting filesystems: /dev/sda1 -> /",
+                "[    0.420000] Loading core assets: [OK]",
+                "[    0.600000] Configuring network: xq0b_hub: 192.168.1.1",
+                "[    0.850000] Starting GUI components...",
+                "[    1.200000] Initialization complete. Welcome, user."
+            ];
+            let i = 0;
+            function printLogs() {
+                if (i < logs.length) {
+                    logEl.innerText += logs[i] + "\n";
+                    i++;
+                    setTimeout(printLogs, 250);
+                } else {
+                    setTimeout(() => { document.getElementById('boot-loader').classList.add('fade-out'); }, 800);
+                }
+            }
+            printLogs();
+        });
+
+        // App Logic
         let loadedItemsStorage = {};
-        const EXCHANGE_RATES = { CNY: 7.24, EUR: 0.92, GBP: 0.78 };
         const GITHUB_USER = "mryeet9043";
         const GITHUB_REPO = "Kakobuy-spreadsheet";
         let currentMainCategory = "IG-Brands";
