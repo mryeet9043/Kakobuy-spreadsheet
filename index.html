@@ -213,7 +213,7 @@
             background-color: #151a22;
             border: 1px solid #2c3540;
             width: 580px;            
-            height: 520px;           
+            height: 520px;            
             border-radius: 28px;
             box-shadow: 0 25px 60px rgba(0,0,0,0.6);
             padding: 28px;
@@ -392,6 +392,7 @@
         <button class="sub-tab-btn active" onclick="switchSubCategory('hoodies', this)">Hoodies</button>
         <button class="sub-tab-btn" onclick="switchSubCategory('jeans', this)">Jeans</button>
         <button class="sub-tab-btn" onclick="switchSubCategory('T-shirts', this)">T-Shirts</button>
+        <button class="sub-tab-btn" onclick="switchSubCategory('sweatpants', this)">Sweatpants</button>
     </div>
     
     <div class="card-grid" id="cardGrid">
@@ -448,7 +449,7 @@ async function findActualGitHubPath(targetPath) {
     let currentPath = 'cards';
     
     for (const part of parts) {
-        const resp = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/currentPath`.replace('currentPath', currentPath));
+        const resp = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${currentPath}`);
         if (!resp.ok) return null;
         const items = await resp.json();
         
@@ -490,7 +491,6 @@ async function loadCategoryCards(relativePath) {
 
         gridContainer.innerHTML = '';
 
-        // Derive user-friendly tag for decoration
         let displayTag = relativePath.replace('/', ' / ');
 
         for (const file of jsonFiles) {
