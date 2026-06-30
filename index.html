@@ -3,63 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>xq0b's finds | System Boot</title>
+    <title>xq0b's finds | system active</title>
     <style>
-        /* --- Extended Boot Loader --- */
+        /* --- Terminal Boot Loader --- */
         #boot-loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; color: #00ff41; font-family: 'Courier New', monospace;
+            background: #050505; color: #33ff66; font-family: 'Courier New', monospace;
             padding: 25px; z-index: 9999; display: flex; flex-direction: column;
-            overflow-y: auto; transition: opacity 0.5s ease;
+            overflow-y: auto; transition: opacity 0.6s ease;
         }
-        #boot-log { font-size: 13px; line-height: 1.4; white-space: pre-wrap; }
+        #boot-log { font-size: 13px; line-height: 1.5; white-space: pre-wrap; opacity: 0.8; }
         .fade-out { opacity: 0; pointer-events: none; }
 
-        /* --- Main UI Styles --- */
+        /* --- Modern UI Styles --- */
         :root {
             --mulebuy-color: #8c7ae6;
             --kakobuy-color: #ff6b6b;
             --litbuy-color: #ff7f50;
             --oopbuy-color: #2e86de;
             --bg-main: #06080a;
-            --card-bg: rgba(25, 32, 42, 0.7);
             --text-main: #94a3b8;
-            --text-bright: #ffffff;
             --accent-glow: #45f3ff;
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Segoe UI', Roboto, sans-serif;
             background: radial-gradient(circle at 50% 0%, #1a1f2e 0%, #06080a 70%);
             color: var(--text-main);
             margin: 0; padding: 60px 20px; min-height: 100vh;
         }
         
-        .hub-heading { text-align: center; margin-bottom: 40px; color: var(--text-bright); font-size: 38px; font-weight: 800; text-transform: uppercase; }
-        .hub-heading::after { content: ''; display: block; width: 40px; height: 3px; background: var(--accent-glow); margin: 15px auto 0; border-radius: 2px; }
+        .hub-heading { text-align: center; margin-bottom: 40px; color: #fff; font-size: 38px; font-weight: 900; letter-spacing: 2px; text-transform: lowercase; }
 
-        .category-nav, .sub-nav { display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; flex-wrap: wrap; }
-        .tab-btn, .sub-tab-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-main); padding: 10px 22px; border-radius: 20px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
-        .tab-btn:hover, .sub-tab-btn:hover { background: rgba(255, 255, 255, 0.08); color: var(--text-bright); }
-        .tab-btn.active { background: var(--text-bright); color: #000; }
-        .sub-tab-btn.active { background: var(--oopbuy-color); color: white; border-color: transparent; }
+        /* Unique Glowing Buttons */
+        .category-nav, .sub-nav { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        
+        .tab-btn, .sub-tab-btn {
+            background: transparent;
+            border: 1px solid rgba(69, 243, 255, 0.2);
+            color: #fff;
+            padding: 10px 25px;
+            border-radius: 4px;
+            text-transform: lowercase;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        .tab-btn:hover, .sub-tab-btn:hover {
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 15px rgba(69, 243, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        .tab-btn.active { background: var(--accent-glow); color: #000; font-weight: bold; }
+        .sub-tab-btn.active { border-color: var(--oopbuy-color); color: var(--oopbuy-color); box-shadow: inset 0 0 10px rgba(46, 134, 222, 0.2); }
 
         .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
-        .preview-card { background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; overflow: hidden; cursor: pointer; transition: 0.3s; }
-        .preview-card:hover { transform: translateY(-8px); border-color: var(--accent-glow); }
-        .card-img-wrap { width: 100%; height: 220px; background: #0b0c10; }
+        .preview-card { background: rgba(15, 20, 25, 0.6); border: 1px solid #1e293b; border-radius: 8px; overflow: hidden; cursor: pointer; transition: 0.3s; }
+        .preview-card:hover { transform: translateY(-5px); border-color: var(--accent-glow); }
+        .card-img-wrap { width: 100%; height: 200px; background: #000; }
         .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
-        .card-content { padding: 18px; }
-        .card-title { font-weight: 600; color: var(--text-bright); margin-bottom: 8px; }
-        .card-tag { font-size: 10px; color: var(--accent-glow); text-transform: uppercase; }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .vault-container { background: #151a22; border: 1px solid #2c3540; width: 500px; padding: 30px; border-radius: 24px; }
-        .vault-agent-btn { display: block; text-align: center; padding: 12px; margin-top: 10px; color: white; font-weight: bold; border-radius: 10px; text-decoration: none; }
-        .v-kakobuy { background: var(--kakobuy-color); }
-        .v-mulebuy { background: var(--mulebuy-color); }
-        .v-litbuy { background: var(--litbuy-color); }
-        .v-oopbuy { background: var(--oopbuy-color); }
+        .card-content { padding: 15px; }
+        
+        .vault-container { background: #0a0a0a; border: 1px solid #333; width: 450px; padding: 25px; border-radius: 0; }
+        .vault-agent-btn { display: block; text-align: center; padding: 10px; margin-top: 8px; color: #fff; text-transform: uppercase; font-size: 12px; border: 1px solid #333; text-decoration: none; }
     </style>
 </head>
 <body>
@@ -71,43 +78,42 @@
     <h1 class="hub-heading">xq0b's finds</h1>
     
     <div class="category-nav">
-        <button class="tab-btn active" onclick="switchCategory('ig-brands', this)">IG Brands</button>
-        <button class="tab-btn" onclick="switchCategory('accessories', this)">Accessories</button>
-        <button class="tab-btn" onclick="switchCategory('hoodies', this)">Hoodies</button>
-        <button class="tab-btn" onclick="switchCategory('jeans', this)">Jeans</button>
-        <button class="tab-btn" onclick="switchCategory('shoes', this)">Shoes</button>
-        <button class="tab-btn" onclick="switchCategory('T-shirts', this)">T-Shirts</button>
+        <button class="tab-btn active" onclick="switchCategory('ig-brands', this)">ig brands</button>
+        <button class="tab-btn" onclick="switchCategory('accessories', this)">accessories</button>
+        <button class="tab-btn" onclick="switchCategory('hoodies', this)">hoodies</button>
+        <button class="tab-btn" onclick="switchCategory('jeans', this)">jeans</button>
+        <button class="tab-btn" onclick="switchCategory('shoes', this)">shoes</button>
+        <button class="tab-btn" onclick="switchCategory('t-shirts', this)">t-shirts</button>
     </div>
 
     <div class="sub-nav" id="igSubNav" style="display: flex;">
-        <button class="sub-tab-btn active" onclick="switchSubCategory('hoodies', this)">Hoodies</button>
-        <button class="sub-tab-btn" onclick="switchSubCategory('jeans', this)">Jeans</button>
-        <button class="sub-tab-btn" onclick="switchSubCategory('sweatpants', this)">Sweatpants</button>
-        <button class="sub-tab-btn" onclick="switchSubCategory('T-shirts', this)">T-Shirts</button>
+        <button class="sub-tab-btn active" onclick="switchSubCategory('hoodies', this)">hoodies</button>
+        <button class="sub-tab-btn" onclick="switchSubCategory('jeans', this)">jeans</button>
+        <button class="sub-tab-btn" onclick="switchSubCategory('sweatpants', this)">sweatpants</button>
+        <button class="sub-tab-btn" onclick="switchSubCategory('t-shirts', this)">t-shirts</button>
     </div>
     
     <div class="card-grid" id="cardGrid"></div>
 
-    <div class="modal-overlay" id="vaultModal" onclick="closeVault(event)">
+    <div class="modal-overlay" id="vaultModal" onclick="closeVault(event)" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000;">
         <div class="vault-container" onclick="event.stopPropagation()">
-            <h1 id="vTitle" style="color: white; font-size: 20px;">Product</h1>
-            <img id="vImg" src="" style="width:100%; border-radius: 12px; margin-bottom: 15px;">
+            <h1 id="vTitle" style="color: #fff; font-size: 18px; text-transform: lowercase;">product</h1>
+            <img id="vImg" src="" style="width:100%; margin-bottom: 15px;">
             <div id="vAgentStack"></div>
-            <button onclick="closeVault(null)" style="margin-top:20px; width:100%; padding:10px; cursor:pointer;">Close</button>
+            <button onclick="closeVault(null)" style="margin-top:20px; width:100%; padding:10px; cursor:pointer; background:transparent; color:white; border:1px solid #555;">close session</button>
         </div>
     </div>
 
     <script>
         const logEl = document.getElementById('boot-log');
         const logs = [
-            "SCANNING_SYSTEM_RESOURCES...", "CHECKING_I/O_PORTS...", "LOADING_KERNEL_MAPS...",
-            "INITIALIZING_VIRTUAL_DISPLAY_DRIVERS...", "MOUNTING_REMOTE_FS...", "FETCHING_DEPENDENCIES...",
-            "VERIFYING_API_INTEGRITY...", "CONNECTING_TO_GITHUB_API...", "DOWNLOADING_ASSET_CACHE...",
-            "DECRYPTING_SECURE_STORAGE...", "PARSING_USER_CONFIGURATION...", "ENABLING_WEBGL_ACCELERATION...",
-            "NETWORK_LATENCY: 12ms", "BUFFER_OVERFLOW_CHECK: PASSED", "MEMORY_USAGE: 402MB/8192MB",
-            "DISK_IO_THROUGHPUT: 450MB/s", "USER_ID: XQ0B_GUEST", "AUTHENTICATION_TOKEN: VALID",
-            "INITIALIZING_GUI_ENGINE...", "RENDERING_UI_NODES...", "LOADING_CATEGORY_BUFFERS...",
-            "SYSTEM_READY_FOR_DEPLOYMENT...", "BOOT_SEQUENCE_COMPLETE...", "STARTUP_SUCCESS: TRUE",
+            "initializing system handshake...", "scanning local hardware nodes...", "checking i/o port latency...",
+            "mounting remote repository system...", "fetching asset manifests...", "establishing secure api link...",
+            "verifying package integrity...", "syncing remote database buffers...", "allocating virtual heap space...",
+            "configuring graphical render pipeline...", "rendering ui components...", "injecting styles...",
+            "network ping: 12ms", "memory status: optimal", "disk throughput: 450mb/s",
+            "user session: guest_xq0b", "auth token: valid", "ready to execute...",
+            "deploying main dashboard...", "loading card cache...", "system status: ready.",
             "...", "...", "...", "...", "...", "...", "...", "...", "...", "...", "...", "...",
         ];
         let idx = 0;
@@ -116,9 +122,9 @@
             idx++;
             if (idx >= logs.length) {
                 clearInterval(interval);
-                setTimeout(() => document.getElementById('boot-loader').classList.add('fade-out'), 300);
+                setTimeout(() => document.getElementById('boot-loader').classList.add('fade-out'), 200);
             }
-        }, 40);
+        }, 50);
 
         let loadedItemsStorage = {};
         const GITHUB_USER = "mryeet9043";
@@ -134,20 +140,17 @@
                 for (const f of files.filter(file => file.name.endsWith('.json'))) {
                     const data = await (await fetch(f.download_url)).json();
                     loadedItemsStorage[data.id] = data;
-                    grid.innerHTML += `<div class="preview-card" onclick="openVaultModal('${data.id}')"><div class="card-img-wrap"><img src="${data.img}"></div><div class="card-content"><div class="card-title">${data.title}</div><div class="card-tag">${path}</div></div></div>`;
+                    grid.innerHTML += `<div class="preview-card" onclick="openVaultModal('${data.id}')"><div class="card-img-wrap"><img src="${data.img}"></div><div class="card-content"><div class="card-title">${data.title}</div></div></div>`;
                 }
-            } catch (e) { grid.innerHTML = 'Data could not be fetched.'; }
+            } catch (e) { grid.innerHTML = 'error: connection failed.'; }
         }
 
         function switchCategory(c, e) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             e.classList.add('active');
             document.getElementById('igSubNav').style.display = (c === 'ig-brands') ? 'flex' : 'none';
-            if (c === 'ig-brands') {
-                loadCategoryCards(`ig-brands/${currentSubCategory}`);
-            } else {
-                loadCategoryCards(c);
-            }
+            if (c === 'ig-brands') { loadCategoryCards(`ig-brands/${currentSubCategory}`); } 
+            else { loadCategoryCards(c); }
         }
 
         function switchSubCategory(s, e) {
@@ -161,7 +164,7 @@
             const item = loadedItemsStorage[id];
             document.getElementById('vTitle').innerText = item.title;
             document.getElementById('vImg').src = item.img;
-            document.getElementById('vAgentStack').innerHTML = `<a href="${item.links.kakobuy}" class="vault-agent-btn v-kakobuy">Kakobuy</a><a href="${item.links.mulebuy}" class="vault-agent-btn v-mulebuy">Mulebuy</a><a href="${item.links.litbuy}" class="vault-agent-btn v-litbuy">Litbuy</a><a href="${item.links.oopbuy}" class="vault-agent-btn v-oopbuy">Oopbuy</a>`;
+            document.getElementById('vAgentStack').innerHTML = `<a href="${item.links.kakobuy}" class="vault-agent-btn">kakobuy</a><a href="${item.links.mulebuy}" class="vault-agent-btn">mulebuy</a><a href="${item.links.litbuy}" class="vault-agent-btn">litbuy</a><a href="${item.links.oopbuy}" class="vault-agent-btn">oopbuy</a>`;
             document.getElementById('vaultModal').style.display = 'flex';
         }
 
