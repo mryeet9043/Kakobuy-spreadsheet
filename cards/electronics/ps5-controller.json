@@ -1,0 +1,13 @@
+{
+  "id": "item_ps5-controller",
+  "title": "PS5 Controller",
+  "price": 23.6,
+  "img": "https://imgs.search.brave.com/1Rm4mnuhmatxqOdnMNcYxv2CWClBN14TrwGhfF2ZQjw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9nYW1l/c25nYWRnZXQuY29t/L3dwLWNvbnRlbnQv/dXBsb2Fkcy8yMDIx/LzEyL1BzNS0xLmpw/Zw",
+  "links": {
+    "id": "7492568496",
+    "mulebuy": "https://mulebuy.com/product?id=7492568496&platform=WEIDIAN",
+    "kakobuy": "https://www.kakobuy.com/item/details?url=https%3A%2F%2Fweidian.com%2Fitem.html%3FitemID%3D7492568496&affcode=xq080910",
+    "litbuy": "https://litbuy.com/product/2/7492568496",
+    "oopbuy": "https://oopbuy.com/product/weidian/7492568496"
+  }
+}
