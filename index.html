@@ -15,10 +15,10 @@
         #boot-text { white-space: pre-wrap; font-size: 13px; line-height: 1.4; padding-bottom: 20px; }
 
         :root {
-            --mulebuy-color: #8c7ae6;
-            --kakobuy-color: #ff6b6b;
-            --litbuy-color: #ff7f50;
-            --oopbuy-color: #2e86de;
+            var(--mulebuy-color): #8c7ae6;
+            var(--kakobuy-color): #ff6b6b;
+            var(--litbuy-color): #ff7f50;
+            var(--oopbuy-color): #2e86de;
             --bg-main: #000;
             --card-bg: #111;
             --text-main: #888;
@@ -148,10 +148,10 @@
         .agent-buttons-stack { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
         .vault-agent-btn { display: block; text-align: center; padding: 10px; color: white; text-decoration: none; font-weight: bold; border-radius: 12px; font-size: 13px; }
         
-        .v-kakobuy { background-color: var(--kakobuy-color); }
-        .v-mulebuy { background-color: var(--mulebuy-color); }
-        .v-litbuy { background-color: var(--litbuy-color); }
-        .v-oopbuy { background-color: var(--oopbuy-color); }
+        .v-kakobuy { background-color: #ff6b6b; }
+        .v-mulebuy { background-color: #8c7ae6; }
+        .v-litbuy { background-color: #ff7f50; }
+        .v-oopbuy { background-color: #2e86de; }
 
         .vault-pricing-box { background: #111; border: 1px solid #333; border-radius: 18px; padding: 20px; }
         .vault-price-badge { color: #fff; font-size: 26px; font-weight: 800; }
@@ -172,6 +172,8 @@
         <button class="tab-btn" onclick="switchCategory('hoodies', this)">Hoodies</button>
         <button class="tab-btn" onclick="switchCategory('jeans', this)">Jeans</button>
         <button class="tab-btn" onclick="switchCategory('shoes', this)">Shoes</button>
+        <button class="tab-btn" onclick="switchCategory('shorts', this)">Shorts</button>
+        <button class="tab-btn" onclick="switchCategory('electronics', this)">Electronics</button>
         <button class="tab-btn" onclick="switchCategory('T-shirts', this)">T-Shirts</button>
     </div>
 
@@ -308,10 +310,10 @@ function openVaultModal(cardId) {
     document.getElementById('vPriceUsd').innerText = `≈ $${itemData.price.toFixed(2)}`;
     document.getElementById('vPriceConversions').innerHTML = `¥ ${(itemData.price * EXCHANGE_RATES.CNY).toFixed(2)}<br>€ ${(itemData.price * EXCHANGE_RATES.EUR).toFixed(2)}<br>£ ${(itemData.price * EXCHANGE_RATES.GBP).toFixed(2)}`;
     document.getElementById('vAgentStack').innerHTML = `
-        <a href="${itemData.links.kakobuy}" class="vault-agent-btn v-kakobuy">Open in Kakobuy</a>
-        <a href="${itemData.links.mulebuy}" class="vault-agent-btn v-mulebuy">Open in Mulebuy</a>
-        <a href="${itemData.links.litbuy}" class="vault-agent-btn v-litbuy">Open in Litbuy</a>
-        <a href="${itemData.links.oopbuy}" class="vault-agent-btn v-oopbuy">Open in Oopbuy</a>
+        <a href="${itemData.links.kakobuy}" target="_blank" rel="noopener noreferrer" class="vault-agent-btn v-kakobuy">Open in Kakobuy</a>
+        <a href="${itemData.links.mulebuy}" target="_blank" rel="noopener noreferrer" class="vault-agent-btn v-mulebuy">Open in Mulebuy</a>
+        <a href="${itemData.links.litbuy}" target="_blank" rel="noopener noreferrer" class="vault-agent-btn v-litbuy">Open in Litbuy</a>
+        <a href="${itemData.links.oopbuy}" target="_blank" rel="noopener noreferrer" class="vault-agent-btn v-oopbuy">Open in Oopbuy</a>
     `;
     document.getElementById('vaultModal').style.display = 'flex';
 }
