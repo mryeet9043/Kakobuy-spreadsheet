@@ -1,0 +1,13 @@
+{
+  "id": "item_burberry-sunglasses",
+  "title": "Burberry Sunglasses",
+  "price": 8.01,
+  "img": "https://si.geilicdn.com/open1856156775-1234478995-49ff0000019f51b6f6b90a8133b0_1065_1065.jpg?w=400&h=400&q=85",
+  "links": {
+    "id": "7810845062",
+    "mulebuy": "https://mulebuy.com/product?id=7810845062&platform=WEIDIAN",
+    "kakobuy": "https://www.kakobuy.com/item/details?url=https%3A%2F%2Fweidian.com%2Fitem.html%3FitemID%3D7810845062&affcode=xq080910",
+    "litbuy": "https://litbuy.com/product/2/7810845062",
+    "oopbuy": "https://oopbuy.com/product/weidian/7810845062"
+  }
+}
